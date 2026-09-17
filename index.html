@@ -2,17 +2,43 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HSE Executive Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>HSE Project Management Dashboard</title>
 <style>
 *{box-sizing:border-box;font-family:Arial,system-ui,sans-serif}
-body{margin:0;background:linear-gradient(135deg,#071f2b,#0d3542 55%,#123e48);color:#17242d}
+body{margin:0;background:linear-gradient(135deg,#071f2b,#0d3542 55%,#123e48);color:#17242d;min-height:100vh}
+button,select{font-family:inherit}
+.hidden{display:none!important}
 header{padding:20px 24px 10px;color:#fff;display:flex;justify-content:space-between;align-items:center}
 h1{margin:0;font-size:24px}
 .sub{font-size:12px;color:#b9d0d6;margin-top:5px}
 .badge{background:#0b7f68;color:#fff;padding:9px 13px;border-radius:9px;font-size:10px;font-weight:800}
 .wrap{padding:10px 24px 24px;max-width:1800px;margin:auto}
+.selectionView{min-height:70vh;display:flex;align-items:center;justify-content:center}
+.selectionCard{width:min(950px,100%);background:#103845;border:1px solid #35606a;border-radius:22px;padding:30px;box-shadow:0 15px 45px #0005;color:#fff;text-align:center}
+.selectionTitle{font-size:24px;font-weight:900;margin-bottom:8px}
+.selectionSub{font-size:12px;color:#b9d0d6;margin-bottom:25px}
+.selectionGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.selectionButton{border:1px solid #47717a;background:#174653;color:#fff;border-radius:14px;padding:20px 10px;font-size:13px;font-weight:850;cursor:pointer;transition:.2s}
+.selectionButton:hover{background:#237060;transform:translateY(-2px)}
+.selectionButton.all{background:#0b7f68}
+.backButton{border:1px solid #52737b;background:transparent;color:#dcebed;border-radius:9px;padding:8px 14px;font-size:10px;font-weight:800;cursor:pointer;margin-bottom:15px}
+.backButton:hover{background:#174653}
+.selectionPath{font-size:11px;color:#b9d0d6;margin-bottom:20px}
+.periodGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.periodButton{border:1px solid #47717a;background:#174653;color:#fff;border-radius:10px;padding:12px 7px;font-size:10px;font-weight:800;cursor:pointer}
+.periodButton:hover{background:#237060}
+.periodButton.all{background:#0b7f68}
+.loadingView{min-height:65vh;display:flex;align-items:center;justify-content:center}
+.loadingCard{background:#103845;border:1px solid #35606a;border-radius:18px;padding:35px 50px;color:#fff;text-align:center}
+.spinner{width:34px;height:34px;border:4px solid #47717a;border-top-color:#4bd0a8;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
+.loadingText{font-size:12px;font-weight:800}
+@keyframes spin{to{transform:rotate(360deg)}}
+.errorBox{background:#4b2520;border:1px solid #b45b4b;color:#fff;border-radius:12px;padding:18px;text-align:center;margin:20px 0;font-size:11px}
+.dashboardTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.selectionInfo{color:#b9d0d6;font-size:10px}
+.changeButton{background:#0b7f68;border:0;color:#fff;padding:9px 13px;border-radius:9px;font-size:10px;font-weight:800;cursor:pointer}
 .filters{background:#103845;border:1px solid #35606a;border-radius:13px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .filter-group label{display:block;font-size:9px;color:#b8cdd2;font-weight:800;margin-bottom:5px}
 select{width:100%;border:1px solid #35606a;border-radius:8px;padding:9px 10px;background:#f8fafb;color:#17242d;font-size:11px;font-weight:700;cursor:pointer}
@@ -65,36 +91,60 @@ select{width:100%;border:1px solid #35606a;border-radius:8px;padding:9px 10px;ba
 .trend{margin-top:9px;background:linear-gradient(135deg,#eef6f7,#dce9ed);border:1px solid #cedde3;border-radius:11px;padding:9px}
 .trendhead{display:flex;justify-content:space-between;font-size:9px;font-weight:850}
 .chart{width:100%;height:50px;margin-top:3px}
-.loading{color:#b9d0d6;text-align:center;padding:35px;font-size:12px}
-.loading small{display:block;margin-top:7px;font-size:9px;color:#8faeb7}
 .empty{background:#fff;border-radius:14px;padding:40px;text-align:center;color:#6b7280;grid-column:1/-1}
 footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
-@media(max-width:1200px){
-.projects{grid-template-columns:repeat(2,1fr)}
-.portfolio{grid-template-columns:repeat(3,1fr)}
-}
-@media(max-width:700px){
-header{padding:15px}
-.wrap{padding:8px 12px 20px}
-.filters{grid-template-columns:1fr}
-.projects{grid-template-columns:1fr}
-.portfolio{grid-template-columns:repeat(2,1fr)}
-.info{grid-template-columns:72px 1fr 82px}
-.bars{height:174px}
-.detailRow{grid-template-columns:1fr}
-}
+@media(max-width:1200px){.projects{grid-template-columns:repeat(2,1fr)}.portfolio{grid-template-columns:repeat(3,1fr)}.selectionGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){header{padding:15px}.wrap{padding:8px 12px 20px}.filters{grid-template-columns:1fr}.projects{grid-template-columns:1fr}.portfolio{grid-template-columns:repeat(2,1fr)}.detailRow{grid-template-columns:1fr}.selectionCard{padding:20px}.selectionGrid{grid-template-columns:1fr}.periodGrid{grid-template-columns:repeat(2,1fr)}.selectionTitle{font-size:20px}}
 </style>
 </head>
 <body>
 <header>
 <div>
-<h1>HSE EXECUTIVE DASHBOARD</h1>
+<h1>HSE PROJECT MANAGEMENT DASHBOARD</h1>
 <div class="sub">Rowad Modern Engineering • HSE Department</div>
 </div>
 <div class="badge">LIVE DATA</div>
 </header>
-
 <div class="wrap">
+<div id="projectView" class="selectionView">
+<div class="selectionCard">
+<div class="selectionTitle">Select Project</div>
+<div class="selectionSub">Choose a project to continue</div>
+<div id="projectButtons" class="selectionGrid"></div>
+</div>
+</div>
+<div id="yearView" class="selectionView hidden">
+<div class="selectionCard">
+<button class="backButton" onclick="showView('project')">← Change Project</button>
+<div id="yearTitle" class="selectionTitle">Select Year</div>
+<div id="yearPath" class="selectionPath"></div>
+<div class="selectionSub">Choose the reporting year</div>
+<div id="yearButtons" class="selectionGrid"></div>
+</div>
+</div>
+<div id="periodView" class="selectionView hidden">
+<div class="selectionCard">
+<button class="backButton" onclick="showView('year')">← Change Year</button>
+<div id="periodTitle" class="selectionTitle">Select Period</div>
+<div id="periodPath" class="selectionPath"></div>
+<div class="selectionSub">Choose the reporting period</div>
+<div id="periodButtons" class="periodGrid"></div>
+</div>
+</div>
+<div id="loadingView" class="loadingView hidden">
+<div class="loadingCard">
+<div class="spinner"></div>
+<div id="loadingText" class="loadingText">Loading requested dashboard data...</div>
+</div>
+</div>
+<div id="errorView" class="hidden">
+<div id="errorBox" class="errorBox"></div>
+</div>
+<div id="dashboardView" class="hidden">
+<div class="dashboardTop">
+<div id="selectionInfo" class="selectionInfo"></div>
+<button class="changeButton" onclick="showView('project')">← Change Selection</button>
+</div>
 <div class="filters">
 <div class="filter-group">
 <label>PROJECT</label>
@@ -105,779 +155,286 @@ header{padding:15px}
 <select id="year"><option value="All Years">All Years</option></select>
 </div>
 <div class="filter-group">
-<label>MONTH</label>
-<select id="month"><option value="All Months">All Months</option></select>
+<label>PERIOD</label>
+<select id="month"><option value="All Months">All Year</option></select>
 </div>
 </div>
-
 <div class="portfolio">
-<div class="sum">
-<label>ACTIVE PROJECTS</label>
-<strong id="activeProjects">0</strong>
-<span class="good">Live projects</span>
+<div class="sum"><label>ACTIVE PROJECTS</label><strong id="activeProjects">0</strong><span class="good">Live projects</span></div>
+<div class="sum"><label>PROJECT PROGRESS</label><strong id="overallProgress">0%</strong><span>Current progress</span></div>
+<div class="sum"><label>NCR CLOSURE</label><strong id="portfolioNcr">0%</strong><span class="good">Closure performance</span></div>
+<div class="sum"><label>TOTAL INCIDENTS</label><strong id="totalIncidents">0</strong><span class="warn">Recorded incidents</span></div>
+<div class="sum"><label>LOW SEVERITY INCIDENTS</label><strong id="lowSeverityRate">0</strong><span>Total low severity</span></div>
+<div class="sum"><label>SAFE MAN-HOURS</label><strong id="portfolioManhours">0</strong><span class="good">Total project man-hours</span></div>
 </div>
-<div class="sum">
-<label>PROJECT PROGRESS</label>
-<strong id="overallProgress">0%</strong>
-<span>Current progress</span>
-</div>
-<div class="sum">
-<label>NCR CLOSURE</label>
-<strong id="portfolioNcr">0%</strong>
-<span class="good">Closure performance</span>
-</div>
-<div class="sum">
-<label>TOTAL INCIDENTS</label>
-<strong id="totalIncidents">0</strong>
-<span class="warn">Recorded incidents</span>
-</div>
-<div class="sum">
-<label>LOW SEVERITY INCIDENTS</label>
-<strong id="lowSeverityRate">0</strong>
-<span>Total low severity</span>
-</div>
-<div class="sum">
-<label>SAFE MAN-HOURS</label>
-<strong id="portfolioManhours">0</strong>
-<span class="good">Total project man-hours</span>
+<div class="projects" id="projects"></div>
 </div>
 </div>
-
-<div class="projects" id="projects">
-<div class="loading">Loading dashboard data...</div>
-</div>
-</div>
-
 <footer>Management View • Live HSE Project Data</footer>
-
 <script>
 const API_URL='https://script.google.com/macros/s/AKfycbxeHHFR0pAMSjxS986ODCgIIsK_5nwgWH_UXdPeJCXAp3yVc5WJmdDv0Rf0s6WzysZo/exec';
-
-const API_TIMEOUT=10000;
-const MAX_RETRIES=3;
-const RETRY_DELAY=1200;
-
+const PROJECTS=['Sokhna port development project','EGAT','AS2','Grain Bulk Terminal','Open Channel','Alstom','Yada'];
+const YEARS=['2026','2027','2028'];
+const MONTHS=[{value:'All Months',label:'All Year'},{value:'January',label:'January'},{value:'February',label:'February'},{value:'March',label:'March'},{value:'April',label:'April'},{value:'May',label:'May'},{value:'June',label:'June'},{value:'July',label:'July'},{value:'August',label:'August'},{value:'September',label:'September'},{value:'October',label:'October'},{value:'November',label:'November'},{value:'December',label:'December'}];
 let charts={};
 let jsonpCounter=0;
-let dashboardRequestId=0;
-let filterRequestId=0;
-
-function sleep(ms){
-return new Promise(resolve=>setTimeout(resolve,ms));
+let currentSelection={project:'',year:'',month:'All Months'};
+let requestToken=0;
+function showView(view){
+document.getElementById('projectView').classList.add('hidden');
+document.getElementById('yearView').classList.add('hidden');
+document.getElementById('periodView').classList.add('hidden');
+document.getElementById('loadingView').classList.add('hidden');
+document.getElementById('dashboardView').classList.add('hidden');
+document.getElementById('errorView').classList.add('hidden');
+if(view==='project')document.getElementById('projectView').classList.remove('hidden');
+if(view==='year')document.getElementById('yearView').classList.remove('hidden');
+if(view==='period')document.getElementById('periodView').classList.remove('hidden');
+if(view==='loading')document.getElementById('loadingView').classList.remove('hidden');
+if(view==='dashboard')document.getElementById('dashboardView').classList.remove('hidden');
+if(view==='project'){
+currentSelection={project:'',year:'',month:'All Months'};
+destroyCharts();
 }
-
-function callAPIAttempt(action,params={},attempt=1,requestToken=null){
+}
+function buildSelectionButtons(){
+const projectContainer=document.getElementById('projectButtons');
+projectContainer.innerHTML='';
+PROJECTS.forEach(function(project){
+const button=document.createElement('button');
+button.className='selectionButton';
+button.textContent=project;
+button.onclick=function(){selectProject(project)};
+projectContainer.appendChild(button);
+});
+const allButton=document.createElement('button');
+allButton.className='selectionButton all';
+allButton.textContent='All Projects';
+allButton.onclick=function(){selectProject('All Projects')};
+projectContainer.appendChild(allButton);
+const yearContainer=document.getElementById('yearButtons');
+yearContainer.innerHTML='';
+YEARS.forEach(function(year){
+const button=document.createElement('button');
+button.className='selectionButton';
+button.textContent=year;
+button.onclick=function(){selectYear(year)};
+yearContainer.appendChild(button);
+});
+const allYears=document.createElement('button');
+allYears.className='selectionButton all';
+allYears.textContent='All Years';
+allYears.onclick=function(){selectYear('All Years')};
+yearContainer.appendChild(allYears);
+const periodContainer=document.getElementById('periodButtons');
+periodContainer.innerHTML='';
+MONTHS.forEach(function(month){
+const button=document.createElement('button');
+button.className='periodButton'+(month.value==='All Months'?' all':'');
+button.textContent=month.label;
+button.onclick=function(){selectPeriod(month.value)};
+periodContainer.appendChild(button);
+});
+}
+function selectProject(project){
+currentSelection.project=project;
+currentSelection.year='';
+currentSelection.month='All Months';
+document.getElementById('yearTitle').textContent=project==='All Projects'?'All Projects':'Select Year';
+document.getElementById('yearPath').textContent=project;
+showView('year');
+}
+function selectYear(year){
+currentSelection.year=year;
+currentSelection.month='All Months';
+document.getElementById('periodTitle').textContent='Select Period';
+document.getElementById('periodPath').textContent=currentSelection.project+' • '+year;
+showView('period');
+}
+function selectPeriod(month){
+currentSelection.month=month;
+loadDashboard();
+}
+function loadDashboard(){
+const token=++requestToken;
+showView('loading');
+document.getElementById('loadingText').textContent='Loading '+(currentSelection.project==='All Projects'?'all projects':currentSelection.project)+' • '+currentSelection.year+' • '+(currentSelection.month==='All Months'?'All Year':currentSelection.month);
+callAPI('getDashboardData',{project:currentSelection.project,year:currentSelection.year,month:currentSelection.month},2,15000).then(function(data){
+if(token!==requestToken)return;
+if(!data||data.success===false)throw new Error(data&&data.error?data.error:'No dashboard data returned.');
+document.getElementById('project').value=currentSelection.project;
+document.getElementById('year').value=currentSelection.year;
+document.getElementById('month').value=currentSelection.month;
+document.getElementById('selectionInfo').textContent=currentSelection.project+' • '+currentSelection.year+' • '+(currentSelection.month==='All Months'?'All Year':currentSelection.month);
+updateDashboard(data);
+showView('dashboard');
+}).catch(function(error){
+if(token!==requestToken)return;
+showError(error.message||'Unable to load dashboard data.');
+});
+}
+function showError(message){
+document.getElementById('errorBox').innerHTML=escapeHtml(message)+'<br><button class="changeButton" style="margin-top:12px" onclick="showView(\'period\')">Back to Selection</button>';
+document.getElementById('errorView').classList.remove('hidden');
+document.getElementById('loadingView').classList.add('hidden');
+}
+function callAPI(action,params={},retries=2,timeout=15000){
 return new Promise(function(resolve,reject){
-
+let attempts=0;
+function request(){
+attempts++;
 const callbackName='__hse_callback_'+Date.now()+'_'+(++jsonpCounter);
 const script=document.createElement('script');
 const queryParams=new URLSearchParams();
-
 queryParams.set('action',action);
 queryParams.set('callback',callbackName);
-
-Object.keys(params).forEach(function(key){
-if(params[key]!==undefined&&params[key]!==null){
-queryParams.set(key,params[key]);
-}
-});
-
+Object.keys(params).forEach(function(key){queryParams.set(key,params[key]);});
 script.src=API_URL+'?'+queryParams.toString();
-
 let completed=false;
-let timeoutId=null;
-
-function cleanup(){
-if(timeoutId)clearTimeout(timeoutId);
-try{delete window[callbackName]}catch(e){}
-if(script.parentNode)script.parentNode.removeChild(script);
-}
-
-function finishError(error){
+const timer=setTimeout(function(){
 if(completed)return;
 completed=true;
 cleanup();
-reject(error);
+if(attempts<=retries){
+setTimeout(request,500*attempts);
+}else{
+reject(new Error('Dashboard API timeout. Please try again.'));
 }
-
+},timeout);
+function cleanup(){
+clearTimeout(timer);
+delete window[callbackName];
+if(script.parentNode)script.parentNode.removeChild(script);
+}
 window[callbackName]=function(data){
 if(completed)return;
 completed=true;
 cleanup();
-
-if(data&&data.error){
-reject(new Error(data.message||'API Error'));
+if(data&&data.success===false){
+if(attempts<=retries){
+setTimeout(request,500*attempts);
+}else{
+reject(new Error(data.error||'API Error'));
+}
 return;
 }
-
 resolve(data);
 };
-
 script.onerror=function(){
-finishError(new Error('Unable to connect to HSE Dashboard API.'));
+if(completed)return;
+completed=true;
+cleanup();
+if(attempts<=retries){
+setTimeout(request,500*attempts);
+}else{
+reject(new Error('Unable to connect to HSE Dashboard API.'));
+}
 };
-
-timeoutId=setTimeout(function(){
-finishError(new Error('API request timed out.'));
-},API_TIMEOUT);
-
 document.body.appendChild(script);
-
+}
+request();
 });
 }
-
-async function callAPI(action,params={},options={}){
-const maxRetries=options.maxRetries||MAX_RETRIES;
-const token=options.token||null;
-const loadingCallback=options.onAttempt||null;
-
-let lastError=null;
-
-for(let attempt=1;attempt<=maxRetries;attempt++){
-
-if(token&&token.cancelled){
-throw new Error('Request cancelled.');
-}
-
-if(typeof loadingCallback==='function'){
-loadingCallback(attempt,maxRetries);
-}
-
-try{
-
-const data=await callAPIAttempt(
-action,
-params,
-attempt,
-token
-);
-
-if(token&&token.cancelled){
-throw new Error('Request cancelled.');
-}
-
-return data;
-
-}catch(error){
-
-lastError=error;
-
-if(token&&token.cancelled){
-throw new Error('Request cancelled.');
-}
-
-if(attempt<maxRetries){
-await sleep(RETRY_DELAY);
-}
-
-}
-
-}
-
-throw lastError||new Error('API request failed.');
-}
-
-function createRequestToken(type){
-if(type==='dashboard'){
-dashboardRequestId++;
-return{
-id:dashboardRequestId,
-get cancelled(){
-return this.id!==dashboardRequestId;
-}
-};
-}
-
-filterRequestId++;
-return{
-id:filterRequestId,
-get cancelled(){
-return this.id!==filterRequestId;
-}
-};
-}
-
-function setLoadingMessage(attempt,maxRetries){
-const container=document.getElementById('projects');
-
-container.innerHTML=
-'<div class="loading">'+
-'Loading dashboard data...'+
-'<small>Connection attempt '+attempt+' of '+maxRetries+'</small>'+
-'</div>';
-}
-
-function setFilterLoadingMessage(attempt,maxRetries){
-const selects=[
-document.getElementById('project'),
-document.getElementById('year'),
-document.getElementById('month')
-];
-
-if(attempt===1){
-selects.forEach(function(select){
-select.style.opacity='0.7';
-});
-}
-
-if(attempt===maxRetries){
-selects.forEach(function(select){
-select.style.opacity='1';
-});
-}
-}
-
-async function loadFilterOptions(){
-
-const token=createRequestToken('filters');
-
-try{
-
-const data=await callAPI(
-'getFilterOptions',
-{},
-{
-token:token,
-onAttempt:setFilterLoadingMessage
-}
-);
-
-if(token.cancelled||!data)return;
-
-const yearSelect=document.getElementById('year');
-const monthSelect=document.getElementById('month');
-const projectSelect=document.getElementById('project');
-
-if(Array.isArray(data.years)){
-yearSelect.innerHTML='<option value="All Years">All Years</option>';
-
-data.years.forEach(function(year){
-const option=document.createElement('option');
-option.value=year;
-option.textContent=year;
-yearSelect.appendChild(option);
-});
-}
-
-if(Array.isArray(data.months)){
-monthSelect.innerHTML='<option value="All Months">All Months</option>';
-
-data.months.forEach(function(month){
-const option=document.createElement('option');
-option.value=month;
-option.textContent=month;
-monthSelect.appendChild(option);
-});
-}
-
-if(Array.isArray(data.projects)){
-projectSelect.innerHTML='<option value="All Projects">All Projects</option>';
-
-data.projects.forEach(function(project){
-const option=document.createElement('option');
-option.value=project;
-option.textContent=project;
-projectSelect.appendChild(option);
-});
-}
-
-yearSelect.style.opacity='1';
-monthSelect.style.opacity='1';
-projectSelect.style.opacity='1';
-
-}catch(error){
-
-if(token.cancelled)return;
-
-console.warn('Filter options unavailable:',error);
-
-yearSelectSafeMessage(error);
-
-}
-
-}
-
-function yearSelectSafeMessage(error){
-const year=document.getElementById('year');
-const month=document.getElementById('month');
-const project=document.getElementById('project');
-
-year.style.opacity='1';
-month.style.opacity='1';
-project.style.opacity='1';
-
-console.warn('Filter loading failed after retries:',error.message);
-}
-
-async function loadDashboard(){
-
-const token=createRequestToken('dashboard');
-
-showLoading(1,MAX_RETRIES);
-
-const year=document.getElementById('year').value;
-const month=document.getElementById('month').value;
-const project=document.getElementById('project').value;
-
-try{
-
-const data=await callAPI(
-'getDashboardData',
-{
-year:year,
-month:month,
-project:project
-},
-{
-token:token,
-onAttempt:function(attempt,maxRetries){
-if(!token.cancelled){
-setLoadingMessage(attempt,maxRetries);
-}
-}
-}
-);
-
-if(token.cancelled)return;
-
-updateDashboard(data);
-
-}catch(error){
-
-if(token.cancelled)return;
-
-console.error('Dashboard error:',error);
-
-document.getElementById('projects').innerHTML=
-'<div class="empty">'+
-escapeHtml(
-error.message==='API request timed out.'
-?'The HSE Dashboard API is taking too long to respond. Automatic retry failed.'
-:error.message
-)+
-'</div>';
-
-}
-
-}
-
-function showLoading(attempt,maxRetries){
-
-document.getElementById('projects').innerHTML=
-'<div class="loading">'+
-'Loading dashboard data...'+
-'<small>Connection attempt '+attempt+' of '+maxRetries+'</small>'+
-'</div>';
-
-}
-
 function updateDashboard(data){
-
-if(!data)return;
-
 const projects=Array.isArray(data.projectData)?data.projectData:[];
-
 updatePortfolio(data,projects);
 renderProjects(projects);
-
 }
-
 function updatePortfolio(data,projects){
-
-document.getElementById('activeProjects').textContent=
-formatNumber(projects.length);
-
-document.getElementById('overallProgress').textContent=
-formatPercent(data.progress);
-
-document.getElementById('portfolioNcr').textContent=
-formatNumber(data.ncr);
-
-document.getElementById('totalIncidents').textContent=
-formatNumber(data.totalIncidents);
-
-document.getElementById('lowSeverityRate').textContent=
-formatNumber(
-Number(data.nearMiss||0)+
-Number(data.firstAid||0)+
-Number(data.mtc||0)
-);
-
-document.getElementById('portfolioManhours').textContent=
-formatNumber(data.manhours);
-
+document.getElementById('activeProjects').textContent=formatNumber(projects.length);
+document.getElementById('overallProgress').textContent=formatPercent(data.progress);
+document.getElementById('portfolioNcr').textContent=formatPercent(data.ncr);
+document.getElementById('totalIncidents').textContent=formatNumber(data.totalIncidents);
+document.getElementById('lowSeverityRate').textContent=formatNumber(Number(data.nearMiss||0)+Number(data.firstAid||0)+Number(data.mtc||0));
+document.getElementById('portfolioManhours').textContent=formatNumber(data.manhours);
 }
-
 function renderProjects(projects){
-
 const container=document.getElementById('projects');
-
+destroyCharts();
 if(!projects||projects.length===0){
-
-container.innerHTML=
-'<div class="empty">No project data available for the selected filters.</div>';
-
-destroyCharts();
+container.innerHTML='<div class="empty">No project data available for the selected filters.</div>';
 return;
-
 }
-
-destroyCharts();
-
-container.innerHTML=projects.map(function(project,index){
-return createProjectCard(project,index);
-}).join('');
-
-projects.forEach(function(project,index){
-createMiniTrend(project,index);
-});
-
+container.innerHTML=projects.map(function(project,index){return createProjectCard(project,index)}).join('');
+projects.forEach(function(project,index){createMiniTrend(project,index)});
 }
-
-function destroyCharts(){
-
-Object.keys(charts).forEach(function(key){
-
-try{
-if(charts[key])charts[key].destroy();
-}catch(error){
-console.warn('Chart destroy error:',error);
-}
-
-});
-
-charts={};
-
-}
-
 function createProjectCard(p,index){
-
 const progress=clamp(Number(p.progress||0),0,100);
-
-const lowCount=
-Number(p.nearMiss||0)+
-Number(p.firstAid||0)+
-Number(p.mtc||0);
-
+const lowCount=Number(p.nearMiss||0)+Number(p.firstAid||0)+Number(p.mtc||0);
 const seriousCount=Number(p.lti||0);
-
 const seriousRate=Number(p.seriousIncidentRate||0);
-
 const projectId='project_'+index;
-
-return `
-<div class="card project-card">
-<div class="ctop">
-<div class="pname">${escapeHtml(p.project||'Project')}</div>
-<div class="status">${getProjectStatus(progress,seriousRate)}</div>
-</div>
-
-<div class="info">
-<div class="ring" style="--progress:${progress*3.6}deg">
-<b>${formatPercent(progress)}</b>
-</div>
-
-<div>
-<div class="label">PROJECT PROGRESS</div>
-<div class="value">${formatPercent(progress)}</div>
-<div class="note">Real project progress from HSE project data.</div>
-</div>
-
-<div class="man">
-<div class="label">MANPOWER</div>
-<div class="value">${formatNumber(p.manpower)}</div>
-<div class="label" style="margin-top:5px">SAFETY</div>
-<div class="value">${formatNumber(p.safety)}</div>
-</div>
-</div>
-
-<div class="safety">
-<div class="shead">
-<b>SAFETY PERFORMANCE INDICATORS</b>
-<span>Actual data</span>
-</div>
-
-<div class="bars">
-${indicatorBar('Toolbox',p.toolbox,100,false)}
-${indicatorBar('Training',p.training,100,false)}
-${indicatorBar('NCR Closure',p.ncr,100,false,true)}
-${indicatorBar('Actions',p.actions,100,false,true)}
-${indicatorBar('Walkdowns',p.walkdowns,100,false,true)}
-${indicatorBar('Low Severity',lowCount,rateScale(lowCount),true)}
-${indicatorBar('Serious',seriousCount,rateScale(seriousCount),true)}
-</div>
-</div>
-
-<div class="detailRow">
-
-<div class="expand" onclick="toggleExpand(this)">
-<div class="expandHead">
-<b>INCIDENT SUMMARY</b>
-<span><span class="arrow">▼</span></span>
-</div>
-
-<div class="expandBody">
-<div class="grid8">
-${mini('Near Miss',p.nearMiss)}
-${mini('First Aid',p.firstAid)}
-${mini('Medical Treatment',p.mtc)}
-${mini('LTI',p.lti)}
-${mini('Property Damage',p.property)}
-${mini('Environmental',p.environment)}
-${mini('Total Low Severity',formatNumber(lowCount))}
-${mini('Total Serious',formatNumber(seriousCount))}
-</div>
-</div>
-</div>
-
-<div class="expand" onclick="toggleExpand(this)">
-<div class="expandHead">
-<b>HSE PERFORMANCE</b>
-<span><span class="arrow">▼</span></span>
-</div>
-
-<div class="expandBody">
-<div class="summary">
-<strong>Safe Man-Hours:</strong>
-${formatNumber(p.manhours)}
-</div>
-
-<div class="grid8">
-${mini('NCR Closure',formatNumber(p.ncr))}
-${mini('Action Tracking',p.actions)}
-${mini('Walkdowns',p.walkdowns)}
-${mini('Toolbox Talks',p.toolbox)}
-${mini('Training',p.training)}
-${mini('Manpower',p.manpower)}
-</div>
-</div>
-</div>
-
-</div>
-
-<div class="trend">
-<div class="trendhead">
-<span>HSE PERFORMANCE TREND</span>
-<span>${escapeHtml(p.trendLabel||'Monthly')}</span>
-</div>
-
-<div class="chart">
-<canvas id="${projectId}"></canvas>
-</div>
-</div>
-
-</div>
-`;
-
+return '<div class="card project-card"><div class="ctop"><div class="pname">'+escapeHtml(p.project||'Project')+'</div><div class="status">'+getProjectStatus(progress,seriousRate)+'</div></div><div class="info"><div class="ring" style="--progress:'+progress*3.6+'deg"><b>'+formatPercent(progress)+'</b></div><div><div class="label">PROJECT PROGRESS</div><div class="value">'+formatPercent(progress)+'</div><div class="note">Real project progress from HSE project data.</div></div><div class="man"><div class="label">MANPOWER</div><div class="value">'+formatNumber(p.manpower)+'</div><div class="label" style="margin-top:5px">SAFETY</div><div class="value">'+formatNumber(p.safety)+'</div></div></div><div class="safety"><div class="shead"><b>SAFETY PERFORMANCE INDICATORS</b><span>Actual data</span></div><div class="bars">'+indicatorBar('Toolbox',p.toolbox,100,false)+indicatorBar('Training',p.training,100,false)+indicatorBar('NCR Closure',p.ncr,100,false,true)+indicatorBar('Actions',p.actions,100,false,true)+indicatorBar('Walkdowns',p.walkdowns,100,false,true)+indicatorBar('Low Severity',lowCount,rateScale(lowCount),true)+indicatorBar('Serious',seriousCount,rateScale(seriousCount),true)+'</div></div><div class="detailRow"><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>INCIDENT SUMMARY</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="grid8">'+mini('Near Miss',p.nearMiss)+mini('First Aid',p.firstAid)+mini('Medical Treatment',p.mtc)+mini('LTI',p.lti)+mini('Property Damage',p.property)+mini('Environmental',p.environment)+mini('Total Low Severity',lowCount)+mini('Total Serious',seriousCount)+'</div></div></div><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>HSE PERFORMANCE</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="summary"><strong>Safe Man-Hours:</strong> '+formatNumber(p.manhours)+'</div><div class="grid8">'+mini('NCR Closure',formatPercent(p.ncr))+mini('Action Tracking',p.actions)+mini('Walkdowns',p.walkdowns)+mini('Toolbox Talks',p.toolbox)+mini('Training',p.training)+mini('Manpower',p.manpower)+'</div></div></div></div><div class="trend"><div class="trendhead"><span>HSE PERFORMANCE TREND</span><span>Monthly</span></div><div class="chart"><canvas id="'+projectId+'"></canvas></div></div></div>';
 }
-
-function indicatorBar(name,value,scale,isIncident,forceNumber=false){
-
+function indicatorBar(name,value,scale,isIncident,forceNumber){
 const numeric=Number(value||0);
-
-const height=scale>0
-?clamp(numeric/scale*100,2,100)
-:2;
-
-return `
-<div class="kpi">
-<div class="pct">
-${isIncident||forceNumber?formatNumber(numeric):formatPercent(numeric)}
-</div>
-
-<div class="bararea">
-<div class="${isIncident?'bar incidentbar':'bar'}" style="--h:${height}"></div>
-</div>
-
-<div class="kname">${escapeHtml(name)}</div>
-
-<div class="count">
-${isIncident?'Count':formatNumber(numeric)}
-</div>
-</div>
-`;
-
+const height=scale>0?clamp(numeric/scale*100,2,100):2;
+return '<div class="kpi"><div class="pct">'+(isIncident||forceNumber?formatNumber(numeric):formatPercent(numeric))+'</div><div class="bararea"><div class="'+(isIncident?'bar incidentbar':'bar')+'" style="--h:'+height+'"></div></div><div class="kname">'+escapeHtml(name)+'</div><div class="count">'+(isIncident?'Count':formatNumber(numeric))+'</div></div>';
 }
-
 function mini(label,value){
-
-return `
-<div class="mini">
-<small>${escapeHtml(label)}</small>
-<strong>${formatDisplay(value)}</strong>
-</div>
-`;
-
+return '<div class="mini"><small>'+escapeHtml(label)+'</small><strong>'+formatDisplay(value)+'</strong></div>';
 }
-
 function createMiniTrend(p,index){
-
 const canvasId='project_'+index;
 const canvas=document.getElementById(canvasId);
-
 if(!canvas)return;
-
 const trend=Array.isArray(p.trend)?p.trend:[];
-
-const labels=trend.map(function(x){
-return x.month;
-});
-
-const values=trend.map(function(x){
-return Number(x.progress||0);
-});
-
-if(values.length===0)return;
-
-charts[canvasId]=new Chart(canvas,{
-type:'line',
-data:{
-labels:labels,
-datasets:[{
-data:values,
-tension:0.35,
-pointRadius:4,
-pointBackgroundColor:'#258b79',
-borderColor:'#258b79',
-borderWidth:2,
-fill:false
-}]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{legend:{display:false}},
-scales:{
-x:{display:false},
-y:{display:false,beginAtZero:true,suggestedMax:100}
+const labels=trend.map(function(x){return x.month});
+const values=trend.map(function(x){return Number(x.progress||0)});
+if(!values.length)return;
+charts[canvasId]=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[{data:values,tension:.35,pointRadius:4,pointBackgroundColor:'#258b79',borderColor:'#258b79',borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false,beginAtZero:true,suggestedMax:100}}}});
 }
+function destroyCharts(){
+Object.keys(charts).forEach(function(key){if(charts[key]){charts[key].destroy();delete charts[key]}});
 }
-});
-
-}
-
 function getProjectStatus(progress,seriousRate){
-
 if(Number(seriousRate)>0)return'ATTENTION';
-
 if(Number(progress)>=75)return'ON TRACK';
-
 if(Number(progress)>=40)return'IN PROGRESS';
-
 return'START-UP';
-
 }
-
 function rateScale(value){
-
 const v=Number(value||0);
-
 if(v<=0)return 1;
-
 return Math.max(1,v*2);
-
 }
-
 function toggleExpand(element){
-
 element.classList.toggle('open');
-
 }
-
 function formatNumber(value){
-
 const num=Number(value||0);
-
 if(!isFinite(num))return'0';
-
-return num.toLocaleString('en-US',{
-maximumFractionDigits:2
-});
-
+return num.toLocaleString('en-US',{maximumFractionDigits:2});
 }
-
 function formatPercent(value){
-
 const num=Number(value||0);
-
 if(!isFinite(num))return'0%';
-
-return num.toLocaleString('en-US',{
-maximumFractionDigits:2
-})+'%';
-
+return num.toLocaleString('en-US',{maximumFractionDigits:2})+'%';
 }
-
-function formatRate(value){
-
-const num=Number(value||0);
-
-if(!isFinite(num))return'0';
-
-return num.toLocaleString('en-US',{
-maximumFractionDigits:3
-});
-
-}
-
 function formatDisplay(value){
-
-if(typeof value==='string'&&value.includes('%')){
-return value;
-}
-
+if(typeof value==='string'&&value.includes('%'))return value;
 return formatNumber(value);
-
 }
-
 function clamp(value,min,max){
-
-return Math.min(
-Math.max(Number(value)||0,min),
-max
-);
-
+return Math.min(Math.max(Number(value)||0,min),max);
 }
-
 function escapeHtml(value){
-
-return String(value==null?'':value)
-.replace(/&/g,'&amp;')
-.replace(/</g,'&lt;')
-.replace(/>/g,'&gt;')
-.replace(/"/g,'&quot;')
-.replace(/'/g,'&#039;');
-
+return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
-
-let filterChangeTimer=null;
-
-function handleFilterChange(){
-
-clearTimeout(filterChangeTimer);
-
-filterChangeTimer=setTimeout(function(){
+document.getElementById('project').addEventListener('change',function(){
+currentSelection.project=this.value;
 loadDashboard();
-},150);
-
-}
-
-document.getElementById('year')
-.addEventListener('change',handleFilterChange);
-
-document.getElementById('month')
-.addEventListener('change',handleFilterChange);
-
-document.getElementById('project')
-.addEventListener('change',handleFilterChange);
-
-document.addEventListener('DOMContentLoaded',function(){
-
-loadFilterOptions();
-loadDashboard();
-
 });
-
+document.getElementById('year').addEventListener('change',function(){
+currentSelection.year=this.value;
+loadDashboard();
+});
+document.getElementById('month').addEventListener('change',function(){
+currentSelection.month=this.value;
+loadDashboard();
+});
+buildSelectionButtons();
+showView('project');
 </script>
 </body>
 </html>
