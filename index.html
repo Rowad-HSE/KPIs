@@ -39,12 +39,10 @@ h1{margin:0;font-size:24px}
 .dashboardTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .selectionInfo{color:#b9d0d6;font-size:10px}
 .changeButton{background:#0b7f68;border:0;color:#fff;padding:9px 13px;border-radius:9px;font-size:10px;font-weight:800;cursor:pointer}
-.filters{background:#103845;border:1px solid #35606a;border-radius:13px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.filter-group label{display:block;font-size:9px;color:#b8cdd2;font-weight:800;margin-bottom:5px}
-select{width:100%;border:1px solid #35606a;border-radius:8px;padding:9px 10px;background:#f8fafb;color:#17242d;font-size:11px;font-weight:700;cursor:pointer}
+.changeButton:hover{background:#0f927a}
 .portfolio{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
 .sum{background:#103845;border:1px solid #35606a;border-radius:13px;padding:12px;color:#fff}
-.sum label{font-size:9px;color:#b8cdd2}
+.sum label{font-size:9px;color:#b8cdd2;font-weight:800}
 .sum strong{display:block;font-size:22px;margin:4px 0}
 .sum span{font-size:9px}
 .good{color:#4bd0a8}
@@ -55,14 +53,15 @@ select{width:100%;border:1px solid #35606a;border-radius:8px;padding:9px 10px;ba
 .ctop{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .pname{font-size:15px;font-weight:850}
 .status{background:#e6f4ee;color:#217252;padding:5px 8px;border-radius:20px;font-size:8px;font-weight:800;white-space:nowrap}
-.info{display:grid;grid-template-columns:72px 1fr 82px;gap:10px;align-items:center;background:#f2f7f8;border-radius:12px;padding:10px;margin-top:10px}
-.ring{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(#258b79 var(--progress),#d8e4e8 0)}
-.ring:after{content:"";position:absolute;width:49px;height:49px;border-radius:50%;background:#f2f7f8}
+.info{display:grid;grid-template-columns:80px minmax(0,1fr) 100px;gap:14px;align-items:center;background:#f2f7f8;border-radius:12px;padding:12px;margin-top:10px}
+.ring{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(#258b79 var(--progress),#d8e4e8 0)}
+.ring:after{content:"";position:absolute;width:52px;height:52px;border-radius:50%;background:#f2f7f8}
 .ring b{position:relative;z-index:1;font-size:15px}
-.label{font-size:8px;color:#71808a;font-weight:800}
-.value{font-size:11px;font-weight:850;margin-top:3px}
+.label{font-size:8px;color:#71808a;font-weight:900}
+.value{font-size:12px;font-weight:900;margin-top:3px}
 .note{font-size:9px;color:#52616c;line-height:1.35;margin-top:3px}
-.man{border-left:1px solid #d9e2e7;padding-left:8px}
+.man{border-left:1px solid #d9e2e7;padding-left:12px}
+.man .label{font-weight:900}
 .safety{margin-top:11px;background:linear-gradient(135deg,#123847,#1d5960);color:#fff;border-radius:13px;padding:11px}
 .shead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .shead b{font-size:10px}
@@ -78,15 +77,15 @@ select{width:100%;border:1px solid #35606a;border-radius:8px;padding:9px 10px;ba
 .detailRow{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
 .expand{background:#f8fafb;border:1px solid #dbe4e8;border-radius:11px;overflow:hidden}
 .expandHead{padding:9px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.expandHead b{font-size:9px}
+.expandHead b{font-size:9px;font-weight:900}
 .expandHead span{font-size:9px;font-weight:850}
 .arrow{font-size:12px;color:#6c7a83}
 .expandBody{display:none;padding:0 8px 8px}
 .expand.open .expandBody{display:block}
 .grid8{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
 .mini{background:#fff;border:1px solid #e4e9ec;border-radius:7px;padding:5px}
-.mini small{display:block;color:#74818a;font-size:7px;line-height:1.1}
-.mini strong{font-size:11px}
+.mini small{display:block;color:#74818a;font-size:7px;line-height:1.1;font-weight:800}
+.mini strong{font-size:11px;font-weight:900}
 .summary{font-size:8px;color:#52616c;background:#fff;border:1px solid #e4e9ec;border-radius:7px;padding:7px;margin-bottom:6px;line-height:1.35}
 .trend{margin-top:9px;background:linear-gradient(135deg,#eef6f7,#dce9ed);border:1px solid #cedde3;border-radius:11px;padding:9px}
 .trendhead{display:flex;justify-content:space-between;font-size:9px;font-weight:850}
@@ -94,7 +93,7 @@ select{width:100%;border:1px solid #35606a;border-radius:8px;padding:9px 10px;ba
 .empty{background:#fff;border-radius:14px;padding:40px;text-align:center;color:#6b7280;grid-column:1/-1}
 footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
 @media(max-width:1200px){.projects{grid-template-columns:repeat(2,1fr)}.portfolio{grid-template-columns:repeat(3,1fr)}.selectionGrid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){header{padding:15px}.wrap{padding:8px 12px 20px}.filters{grid-template-columns:1fr}.projects{grid-template-columns:1fr}.portfolio{grid-template-columns:repeat(2,1fr)}.detailRow{grid-template-columns:1fr}.selectionCard{padding:20px}.selectionGrid{grid-template-columns:1fr}.periodGrid{grid-template-columns:repeat(2,1fr)}.selectionTitle{font-size:20px}}
+@media(max-width:700px){header{padding:15px}.wrap{padding:8px 12px 20px}.projects{grid-template-columns:1fr}.portfolio{grid-template-columns:repeat(2,1fr)}.detailRow{grid-template-columns:1fr}.selectionCard{padding:20px}.selectionGrid{grid-template-columns:1fr}.periodGrid{grid-template-columns:repeat(2,1fr)}.selectionTitle{font-size:20px}.dashboardTop{align-items:flex-start;gap:10px}.selectionInfo{line-height:1.5}.info{grid-template-columns:72px minmax(0,1fr) 82px;gap:10px}}
 </style>
 </head>
 <body>
@@ -108,7 +107,7 @@ footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
 <div class="wrap">
 <div id="projectView" class="selectionView">
 <div class="selectionCard">
-<div class="selectionTitle">Select Project</div>
+<div class="selectionTitle">Industrial Projects</div>
 <div class="selectionSub">Choose a project to continue</div>
 <div id="projectButtons" class="selectionGrid"></div>
 </div>
@@ -145,27 +144,37 @@ footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
 <div id="selectionInfo" class="selectionInfo"></div>
 <button class="changeButton" onclick="showView('project')">← Change Selection</button>
 </div>
-<div class="filters">
-<div class="filter-group">
-<label>PROJECT</label>
-<select id="project"><option value="All Projects">All Projects</option></select>
-</div>
-<div class="filter-group">
-<label>YEAR</label>
-<select id="year"><option value="All Years">All Years</option></select>
-</div>
-<div class="filter-group">
-<label>PERIOD</label>
-<select id="month"><option value="All Months">All Year</option></select>
-</div>
-</div>
 <div class="portfolio">
-<div class="sum"><label>ACTIVE PROJECTS</label><strong id="activeProjects">0</strong><span class="good">Live projects</span></div>
-<div class="sum"><label>PROJECT PROGRESS</label><strong id="overallProgress">0%</strong><span>Current progress</span></div>
-<div class="sum"><label>NCR CLOSURE</label><strong id="portfolioNcr">0%</strong><span class="good">Closure performance</span></div>
-<div class="sum"><label>TOTAL INCIDENTS</label><strong id="totalIncidents">0</strong><span class="warn">Recorded incidents</span></div>
-<div class="sum"><label>LOW SEVERITY INCIDENTS</label><strong id="lowSeverityRate">0</strong><span>Total low severity</span></div>
-<div class="sum"><label>SAFE MAN-HOURS</label><strong id="portfolioManhours">0</strong><span class="good">Total project man-hours</span></div>
+<div class="sum">
+<label>ACTIVE PROJECTS</label>
+<strong id="activeProjects">0</strong>
+<span class="good">Live projects</span>
+</div>
+<div class="sum">
+<label>PROJECT PROGRESS</label>
+<strong id="overallProgress">0%</strong>
+<span>Current progress</span>
+</div>
+<div class="sum">
+<label>NCR CLOSURE</label>
+<strong id="portfolioNcr">0 / 0</strong>
+<span class="good">Closed / Open</span>
+</div>
+<div class="sum">
+<label>TOTAL INCIDENTS</label>
+<strong id="totalIncidents">0</strong>
+<span class="warn">Recorded incidents</span>
+</div>
+<div class="sum">
+<label>LOW SEVERITY INCIDENTS</label>
+<strong id="lowSeverityRate">0</strong>
+<span>Total low severity</span>
+</div>
+<div class="sum">
+<label>SAFE MAN-HOURS</label>
+<strong id="portfolioManhours">0</strong>
+<span class="good">Total project man-hours</span>
+</div>
 </div>
 <div class="projects" id="projects"></div>
 </div>
@@ -240,7 +249,7 @@ function selectProject(project){
 currentSelection.project=project;
 currentSelection.year='';
 currentSelection.month='All Months';
-document.getElementById('yearTitle').textContent=project==='All Projects'?'All Projects':'Select Year';
+document.getElementById('yearTitle').textContent='Select Year';
 document.getElementById('yearPath').textContent=project;
 showView('year');
 }
@@ -262,11 +271,8 @@ document.getElementById('loadingText').textContent='Loading '+(currentSelection.
 callAPI('getDashboardData',{project:currentSelection.project,year:currentSelection.year,month:currentSelection.month},2,15000).then(function(data){
 if(token!==requestToken)return;
 if(!data||data.success===false)throw new Error(data&&data.error?data.error:'No dashboard data returned.');
-document.getElementById('project').value=currentSelection.project;
-document.getElementById('year').value=currentSelection.year;
-document.getElementById('month').value=currentSelection.month;
-document.getElementById('selectionInfo').textContent=currentSelection.project+' • '+currentSelection.year+' • '+(currentSelection.month==='All Months'?'All Year':currentSelection.month);
 updateDashboard(data);
+document.getElementById('selectionInfo').textContent=currentSelection.project+' • '+currentSelection.year+' • '+(currentSelection.month==='All Months'?'All Year':currentSelection.month);
 showView('dashboard');
 }).catch(function(error){
 if(token!==requestToken)return;
@@ -343,10 +349,17 @@ renderProjects(projects);
 function updatePortfolio(data,projects){
 document.getElementById('activeProjects').textContent=formatNumber(projects.length);
 document.getElementById('overallProgress').textContent=formatPercent(data.progress);
-document.getElementById('portfolioNcr').textContent=formatPercent(data.ncr);
+document.getElementById('portfolioNcr').textContent=formatNcr(data);
 document.getElementById('totalIncidents').textContent=formatNumber(data.totalIncidents);
 document.getElementById('lowSeverityRate').textContent=formatNumber(Number(data.nearMiss||0)+Number(data.firstAid||0)+Number(data.mtc||0));
 document.getElementById('portfolioManhours').textContent=formatNumber(data.manhours);
+}
+function formatNcr(data){
+const closed=Number(data.ncrClosed!==undefined?data.ncrClosed:(data.ncr!==undefined?data.ncr:0))||0;
+const open=Number(data.ncrOpen!==undefined?data.ncrOpen:0)||0;
+const total=closed+open;
+if(data.ncrOpen!==undefined)return formatNumber(closed)+' / '+formatNumber(total);
+return formatNumber(closed)+' / 0';
 }
 function renderProjects(projects){
 const container=document.getElementById('projects');
@@ -364,12 +377,35 @@ const lowCount=Number(p.nearMiss||0)+Number(p.firstAid||0)+Number(p.mtc||0);
 const seriousCount=Number(p.lti||0);
 const seriousRate=Number(p.seriousIncidentRate||0);
 const projectId='project_'+index;
-return '<div class="card project-card"><div class="ctop"><div class="pname">'+escapeHtml(p.project||'Project')+'</div><div class="status">'+getProjectStatus(progress,seriousRate)+'</div></div><div class="info"><div class="ring" style="--progress:'+progress*3.6+'deg"><b>'+formatPercent(progress)+'</b></div><div><div class="label">PROJECT PROGRESS</div><div class="value">'+formatPercent(progress)+'</div><div class="note">Real project progress from HSE project data.</div></div><div class="man"><div class="label">MANPOWER</div><div class="value">'+formatNumber(p.manpower)+'</div><div class="label" style="margin-top:5px">SAFETY</div><div class="value">'+formatNumber(p.safety)+'</div></div></div><div class="safety"><div class="shead"><b>SAFETY PERFORMANCE INDICATORS</b><span>Actual data</span></div><div class="bars">'+indicatorBar('Toolbox',p.toolbox,100,false)+indicatorBar('Training',p.training,100,false)+indicatorBar('NCR Closure',p.ncr,100,false,true)+indicatorBar('Actions',p.actions,100,false,true)+indicatorBar('Walkdowns',p.walkdowns,100,false,true)+indicatorBar('Low Severity',lowCount,rateScale(lowCount),true)+indicatorBar('Serious',seriousCount,rateScale(seriousCount),true)+'</div></div><div class="detailRow"><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>INCIDENT SUMMARY</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="grid8">'+mini('Near Miss',p.nearMiss)+mini('First Aid',p.firstAid)+mini('Medical Treatment',p.mtc)+mini('LTI',p.lti)+mini('Property Damage',p.property)+mini('Environmental',p.environment)+mini('Total Low Severity',lowCount)+mini('Total Serious',seriousCount)+'</div></div></div><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>HSE PERFORMANCE</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="summary"><strong>Safe Man-Hours:</strong> '+formatNumber(p.manhours)+'</div><div class="grid8">'+mini('NCR Closure',formatPercent(p.ncr))+mini('Action Tracking',p.actions)+mini('Walkdowns',p.walkdowns)+mini('Toolbox Talks',p.toolbox)+mini('Training',p.training)+mini('Manpower',p.manpower)+'</div></div></div></div><div class="trend"><div class="trendhead"><span>HSE PERFORMANCE TREND</span><span>Monthly</span></div><div class="chart"><canvas id="'+projectId+'"></canvas></div></div></div>';
+return '<div class="card project-card"><div class="ctop"><div class="pname">'+escapeHtml(p.project||'Project')+'</div><div class="status">'+getProjectStatus(progress,seriousRate)+'</div></div><div class="info"><div class="ring" style="--progress:'+progress*3.6+'deg"><b>'+formatPercent(progress)+'</b></div><div><div class="label">PROJECT PROGRESS</div><div class="value">'+formatPercent(progress)+'</div><div class="note">Real project progress from HSE project data.</div></div><div class="man"><div class="label">MANPOWER</div><div class="value">'+formatNumber(p.manpower)+'</div><div class="label" style="margin-top:5px">SAFETY</div><div class="value">'+formatNumber(p.safety)+'</div></div></div><div class="safety"><div class="shead"><b>SAFETY PERFORMANCE INDICATORS</b><span>Actual data</span></div><div class="bars">'+indicatorBar('Toolbox',p.toolbox,100,false)+indicatorBar('Training',p.training,100,false)+indicatorBar('NCR Closure',getNcrClosed(p),getNcrTotal(p),false,true)+indicatorBar('Actions',p.actions,100,false,true)+indicatorBar('Walkdowns',p.walkdowns,100,false,true)+indicatorBar('Low Severity',lowCount,rateScale(lowCount),true)+indicatorBar('Serious',seriousCount,rateScale(seriousCount),true)+'</div></div><div class="detailRow"><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>INCIDENT SUMMARY</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="grid8">'+mini('Near Miss',p.nearMiss)+mini('First Aid',p.firstAid)+mini('Medical Treatment',p.mtc)+mini('LTI',p.lti)+mini('Property Damage',p.property)+mini('Environmental',p.environment)+mini('Total Low Severity',lowCount)+mini('Total Serious',seriousCount)+'</div></div></div><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>HSE PERFORMANCE</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="summary"><strong>Safe Man-Hours:</strong> '+formatNumber(p.manhours)+'</div><div class="grid8">'+mini('NCR Closure',formatNcrProject(p))+mini('Action Tracking',p.actions)+mini('Walkdowns',p.walkdowns)+mini('Toolbox Talks',p.toolbox)+mini('Training',p.training)+mini('Manpower',p.manpower)+'</div></div></div></div><div class="trend"><div class="trendhead"><span>HSE PERFORMANCE TREND</span><span>Monthly</span></div><div class="chart"><canvas id="'+projectId+'"></canvas></div></div></div>';
+}
+function getNcrClosed(p){
+if(p.ncrClosed!==undefined)return Number(p.ncrClosed)||0;
+return Number(p.ncr||0)||0;
+}
+function getNcrOpen(p){
+if(p.ncrOpen!==undefined)return Number(p.ncrOpen)||0;
+return 0;
+}
+function getNcrTotal(p){
+return getNcrClosed(p)+getNcrOpen(p);
+}
+function formatNcrProject(p){
+return formatNumber(getNcrClosed(p))+' / '+formatNumber(getNcrTotal(p));
 }
 function indicatorBar(name,value,scale,isIncident,forceNumber){
 const numeric=Number(value||0);
-const height=scale>0?clamp(numeric/scale*100,2,100):2;
-return '<div class="kpi"><div class="pct">'+(isIncident||forceNumber?formatNumber(numeric):formatPercent(numeric))+'</div><div class="bararea"><div class="'+(isIncident?'bar incidentbar':'bar')+'" style="--h:'+height+'"></div></div><div class="kname">'+escapeHtml(name)+'</div><div class="count">'+(isIncident?'Count':formatNumber(numeric))+'</div></div>';
+const safeScale=Number(scale||0);
+const height=safeScale>0?clamp(numeric/safeScale*100,2,100):2;
+let displayValue;
+if(name==='NCR Closure'){
+displayValue=formatNumber(numeric)+' / '+formatNumber(safeScale);
+}else if(isIncident||forceNumber){
+displayValue=formatNumber(numeric);
+}else{
+displayValue=formatPercent(numeric);
+}
+return '<div class="kpi"><div class="pct">'+displayValue+'</div><div class="bararea"><div class="'+(isIncident?'bar incidentbar':'bar')+'" style="--h:'+height+'"></div></div><div class="kname">'+escapeHtml(name)+'</div><div class="count">'+(isIncident?'Count':name==='NCR Closure'? 'Closed / Total':formatNumber(numeric))+'</div></div>';
 }
 function mini(label,value){
 return '<div class="mini"><small>'+escapeHtml(label)+'</small><strong>'+formatDisplay(value)+'</strong></div>';
@@ -385,7 +421,12 @@ if(!values.length)return;
 charts[canvasId]=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[{data:values,tension:.35,pointRadius:4,pointBackgroundColor:'#258b79',borderColor:'#258b79',borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false,beginAtZero:true,suggestedMax:100}}}});
 }
 function destroyCharts(){
-Object.keys(charts).forEach(function(key){if(charts[key]){charts[key].destroy();delete charts[key]}});
+Object.keys(charts).forEach(function(key){
+if(charts[key]){
+charts[key].destroy();
+delete charts[key];
+}
+});
 }
 function getProjectStatus(progress,seriousRate){
 if(Number(seriousRate)>0)return'ATTENTION';
@@ -413,6 +454,7 @@ return num.toLocaleString('en-US',{maximumFractionDigits:2})+'%';
 }
 function formatDisplay(value){
 if(typeof value==='string'&&value.includes('%'))return value;
+if(typeof value==='string'&&value.includes('/'))return value;
 return formatNumber(value);
 }
 function clamp(value,min,max){
@@ -421,18 +463,6 @@ return Math.min(Math.max(Number(value)||0,min),max);
 function escapeHtml(value){
 return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
-document.getElementById('project').addEventListener('change',function(){
-currentSelection.project=this.value;
-loadDashboard();
-});
-document.getElementById('year').addEventListener('change',function(){
-currentSelection.year=this.value;
-loadDashboard();
-});
-document.getElementById('month').addEventListener('change',function(){
-currentSelection.month=this.value;
-loadDashboard();
-});
 buildSelectionButtons();
 showView('project');
 </script>
