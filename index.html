@@ -92,7 +92,11 @@ h1{margin:0;font-size:24px}
 .chart{width:100%;height:50px;margin-top:3px}
 .empty{background:#fff;border-radius:14px;padding:40px;text-align:center;color:#6b7280;grid-column:1/-1}
 footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
+
+.compareEntry{margin-top:16px;width:100%;border:1px solid #4b8d91;background:#0b7f68;color:#fff;border-radius:12px;padding:12px;font-size:11px;font-weight:900;cursor:pointer;transition:.2s}.compareEntry:hover{background:#0f927a;transform:translateY(-1px)}
+.compareCard{max-width:1200px}.compareSectionTitle{text-align:left;font-size:10px;font-weight:900;color:#c3d9dd;margin:16px 0 8px}.compareProjectGrid{grid-template-columns:repeat(4,1fr)}.compareProjectButton{position:relative}.compareProjectButton.selected{background:#0b7f68;border-color:#69cbb5;box-shadow:0 0 0 2px #69cbb555 inset}.compareProjectButton.selected:after{content:'✓';position:absolute;top:7px;right:9px;font-size:12px;color:#fff}.compareRun{margin-top:16px;border:0;background:#258b79;color:#fff;border-radius:10px;padding:12px 18px;font-size:11px;font-weight:900;cursor:pointer}.compareRun:disabled{opacity:.45;cursor:not-allowed}.compareError{margin-top:12px;background:#4b2520;border:1px solid #b45b4b;color:#fff;padding:10px;border-radius:9px;font-size:10px}.compareResults{margin-top:20px;text-align:left;background:#fff;border-radius:15px;padding:14px;color:#17242d}.compareResultHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.compareResultHead b{font-size:13px}.compareResultHead span{display:block;font-size:9px;color:#71808a;margin-top:3px}.compareTableWrap{overflow:auto;border:1px solid #dbe4e8;border-radius:10px}.compareTable{width:100%;border-collapse:collapse;font-size:8px;min-width:1050px}.compareTable th,.compareTable td{padding:8px;border-bottom:1px solid #e7edf0;text-align:center;white-space:nowrap}.compareTable th{background:#f2f7f8;font-weight:900;color:#5e6c75}.compareTable td:first-child,.compareTable th:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:1}.compareTable .scoreCell{font-weight:900}.compareChartWrap{height:300px;margin-top:14px;background:linear-gradient(135deg,#eef6f7,#dce9ed);border:1px solid #cedde3;border-radius:12px;padding:10px}.compareChartWrap canvas{width:100%!important;height:100%!important}.projectLink{cursor:pointer}.projectLink:hover{text-decoration:underline;color:#147e6d}.singleMode .project-card{grid-column:1/-1}.singleMode .trend{padding:14px}.singleMode .chart{height:330px}.singleMode .safety{padding:14px}.singleMode .detailRow{grid-template-columns:1fr 1fr}.singleMode .trendhead{font-size:11px}.trendheadRight{display:flex;align-items:center;gap:8px}.trendScoreBox{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #d4e0e4;color:#42535d;border-radius:9px;padding:5px 8px}.trendScoreBox b{font-size:11px;color:#17242d}.trendArrow{font-size:14px;font-weight:900}.trendArrow.up{color:#1f936e}.trendArrow.down{color:#c65343}.trendArrow.flat{color:#7a8790}.trendNotice{margin-top:8px;background:#fff;border:1px dashed #c9d7dc;border-radius:8px;padding:8px;font-size:8px;color:#64737c}.trendSnapshot{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}.snap{background:#ffffffdd;border:1px solid #d5e1e5;border-radius:8px;padding:6px;text-align:center}.snap small{display:block;color:#71808a;font-size:7px;font-weight:800}.snap strong{display:block;font-size:10px;margin-top:2px}.singleMode .trendSnapshot{grid-template-columns:repeat(6,1fr)}
 @media(max-width:1200px){.projects{grid-template-columns:repeat(2,1fr)}.portfolio{grid-template-columns:repeat(3,1fr)}.selectionGrid{grid-template-columns:repeat(2,1fr)}}
+.compareProjectGrid{grid-template-columns:repeat(2,1fr)}.trendSnapshot,.singleMode .trendSnapshot{grid-template-columns:repeat(3,1fr)}.compareChartWrap{height:250px}.singleMode .chart{height:300px}
 @media(max-width:700px){header{padding:15px}.wrap{padding:8px 12px 20px}.projects{grid-template-columns:1fr}.portfolio{grid-template-columns:repeat(2,1fr)}.detailRow{grid-template-columns:1fr}.selectionCard{padding:20px}.selectionGrid{grid-template-columns:1fr}.periodGrid{grid-template-columns:repeat(2,1fr)}.selectionTitle{font-size:20px}.dashboardTop{align-items:flex-start;gap:10px}.selectionInfo{line-height:1.5}.info{grid-template-columns:72px minmax(0,1fr) 82px;gap:10px}}
 </style>
 </head>
@@ -110,6 +114,7 @@ footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
 <div class="selectionTitle">Industrial Projects</div>
 <div class="selectionSub">Choose a project to continue</div>
 <div id="projectButtons" class="selectionGrid"></div>
+<button class="compareEntry" onclick="openCompareView()">↔ Compare Projects</button>
 </div>
 </div>
 <div id="yearView" class="selectionView hidden">
@@ -130,6 +135,28 @@ footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
 <div id="periodButtons" class="periodGrid"></div>
 </div>
 </div>
+<div id="compareView" class="selectionView hidden">
+<div class="selectionCard compareCard">
+<button class="backButton" onclick="showView('project')">← Back to Projects</button>
+<div class="selectionTitle">Compare Projects</div>
+<div class="selectionSub">Select two or more projects, then choose the reporting period.</div>
+<div class="compareSectionTitle">Projects</div>
+<div id="compareProjectButtons" class="selectionGrid compareProjectGrid"></div>
+<div class="compareSectionTitle">Year</div>
+<div id="compareYearButtons" class="periodGrid"></div>
+<div class="compareSectionTitle">Period</div>
+<div id="comparePeriodButtons" class="periodGrid"></div>
+<button id="runCompareButton" class="compareRun" onclick="runComparison()" disabled>Compare Selected Projects</button>
+<div id="compareError" class="compareError hidden"></div>
+<div id="compareResults" class="compareResults hidden">
+<div class="compareResultHead">
+<div><b>Project Comparison</b><span id="compareResultMeta"></span></div>
+</div>
+<div class="compareTableWrap"><table class="compareTable"><thead><tr><th>Project</th><th>Progress</th><th>Toolbox</th><th>Training</th><th>NCR Closure</th><th>Actions</th><th>Walkdowns</th><th>Low Severity</th><th>Serious</th><th>Safety Man-Hours</th><th>Safety Manpower</th><th>Safety Index</th></tr></thead><tbody id="compareTableBody"></tbody></table></div>
+<div class="compareChartWrap"><canvas id="compareChart"></canvas></div>
+</div>
+</div>
+</div>
 <div id="loadingView" class="loadingView hidden">
 <div class="loadingCard">
 <div class="spinner"></div>
@@ -142,31 +169,30 @@ footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
 <div id="dashboardView" class="hidden">
 <div class="dashboardTop">
 <div id="selectionInfo" class="selectionInfo"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+<button class="changeButton" onclick="openCompareView()">↔ Compare</button>
 <button class="changeButton" onclick="showView('project')">← Change Selection</button>
+</div>
 </div>
 <div class="portfolio">
 <div class="sum">
-<label>ACTIVE PROJECTS</label>
+<label>PROJECTS DISPLAYED</label>
 <strong id="activeProjects">0</strong>
-<span class="good">Live projects</span>
+<span class="good">Projects in view</span>
 </div>
-<div class="sum">
+<div class="sum" id="progressSummary">
 <label>PROJECT PROGRESS</label>
 <strong id="overallProgress">0%</strong>
-<span>Current progress</span>
+<span>Current project progress</span>
 </div>
 <div class="sum">
 <label>NCR CLOSURE</label>
 <strong id="portfolioNcr">0 / 0</strong>
-<span class="good">Closed / Open</span>
+<span class="good">Closed / Total</span>
+<span id="portfolioNcrOpen" class="warn" style="display:block;margin-top:5px"></span>
 </div>
 <div class="sum">
-<label>TOTAL INCIDENTS</label>
-<strong id="totalIncidents">0</strong>
-<span class="warn">Recorded incidents</span>
-</div>
-<div class="sum">
-<label>LOW SEVERITY INCIDENTS</label>
+<label>TOTAL LOW SEVERITY INCIDENTS</label>
 <strong id="lowSeverityRate">0</strong>
 <span>Total low severity</span>
 </div>
@@ -174,6 +200,11 @@ footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
 <label>SAFE MAN-HOURS</label>
 <strong id="portfolioManhours">0</strong>
 <span class="good">Total project man-hours</span>
+</div>
+<div class="sum">
+<label>TOTAL SAFETY MANPOWER</label>
+<strong id="portfolioSafetyManpower">0</strong>
+<span class="good">Safety manpower in view</span>
 </div>
 </div>
 <div class="projects" id="projects"></div>
@@ -188,22 +219,27 @@ const MONTHS=[{value:'All Months',label:'All Year'},{value:'January',label:'Janu
 let charts={};
 let jsonpCounter=0;
 let currentSelection={project:'',year:'',month:'All Months'};
+let compareSelection={projects:[],year:'',month:'All Months'};
+let compareChart=null;
 let requestToken=0;
 function showView(view){
 document.getElementById('projectView').classList.add('hidden');
 document.getElementById('yearView').classList.add('hidden');
 document.getElementById('periodView').classList.add('hidden');
+document.getElementById('compareView').classList.add('hidden');
 document.getElementById('loadingView').classList.add('hidden');
 document.getElementById('dashboardView').classList.add('hidden');
 document.getElementById('errorView').classList.add('hidden');
 if(view==='project')document.getElementById('projectView').classList.remove('hidden');
 if(view==='year')document.getElementById('yearView').classList.remove('hidden');
 if(view==='period')document.getElementById('periodView').classList.remove('hidden');
+if(view==='compare')document.getElementById('compareView').classList.remove('hidden');
 if(view==='loading')document.getElementById('loadingView').classList.remove('hidden');
 if(view==='dashboard')document.getElementById('dashboardView').classList.remove('hidden');
 if(view==='project'){
 currentSelection={project:'',year:'',month:'All Months'};
 destroyCharts();
+resetCompareView();
 }
 }
 function buildSelectionButtons(){
@@ -245,6 +281,49 @@ button.onclick=function(){selectPeriod(month.value)};
 periodContainer.appendChild(button);
 });
 }
+function buildCompareSelectionButtons(){
+const pc=document.getElementById('compareProjectButtons');
+const yc=document.getElementById('compareYearButtons');
+const mc=document.getElementById('comparePeriodButtons');
+pc.innerHTML='';yc.innerHTML='';mc.innerHTML='';
+PROJECTS.forEach(function(project){
+const b=document.createElement('button');
+b.className='selectionButton compareProjectButton'+(compareSelection.projects.includes(project)?' selected':'');
+b.textContent=project;b.onclick=function(){toggleCompareProject(project)};pc.appendChild(b);
+});
+const all=document.createElement('button');all.className='selectionButton compareProjectButton all'+(compareSelection.projects.length===PROJECTS.length?' selected':'');all.textContent='All Projects';all.onclick=function(){compareSelection.projects=PROJECTS.slice();buildCompareSelectionButtons()};pc.appendChild(all);
+YEARS.forEach(function(year){const b=document.createElement('button');b.className='periodButton'+(compareSelection.year===year?' all':'');b.textContent=year;b.onclick=function(){compareSelection.year=year;buildCompareSelectionButtons();updateCompareRunState()};yc.appendChild(b)});
+const ay=document.createElement('button');ay.className='periodButton all'+(compareSelection.year==='All Years'?' selected':'');ay.textContent='All Years';ay.onclick=function(){compareSelection.year='All Years';buildCompareSelectionButtons();updateCompareRunState()};yc.appendChild(ay);
+MONTHS.forEach(function(month){const b=document.createElement('button');b.className='periodButton'+(month.value==='All Months'?' all':'')+(compareSelection.month===month.value?' selected':'');b.textContent=month.label;b.onclick=function(){compareSelection.month=month.value;buildCompareSelectionButtons();updateCompareRunState()};mc.appendChild(b)});
+updateCompareRunState();
+}
+
+function toggleCompareProject(project){
+const index=compareSelection.projects.indexOf(project);
+if(index>=0)compareSelection.projects.splice(index,1);else compareSelection.projects.push(project);
+buildCompareSelectionButtons();
+}
+
+function openCompareView(){
+compareSelection={projects:PROJECTS.slice(),year:currentSelection.year||'All Years',month:currentSelection.month||'All Months'};
+document.getElementById('compareResults').classList.add('hidden');
+document.getElementById('compareError').classList.add('hidden');
+showView('compare');
+buildCompareSelectionButtons();
+}
+
+function resetCompareView(){
+if(compareChart){compareChart.destroy();compareChart=null}
+const results=document.getElementById('compareResults');if(results)results.classList.add('hidden');
+const err=document.getElementById('compareError');if(err){err.classList.add('hidden');err.textContent=''}
+}
+
+function updateCompareRunState(){
+const btn=document.getElementById('runCompareButton');
+if(!btn)return;
+btn.disabled=compareSelection.projects.length<2||!compareSelection.year;
+}
+
 function selectProject(project){
 currentSelection.project=project;
 currentSelection.year='';
@@ -264,6 +343,13 @@ function selectPeriod(month){
 currentSelection.month=month;
 loadDashboard();
 }
+function openSingleProject(project){
+currentSelection.project=project;
+loadDashboard();
+}
+
+function openSingleProjectFromElement(element){openSingleProject(element&&element.dataset?element.dataset.project:'');}
+
 function loadDashboard(){
 const token=++requestToken;
 showView('loading');
@@ -347,13 +433,25 @@ updatePortfolio(data,projects);
 renderProjects(projects);
 }
 function updatePortfolio(data,projects){
-document.getElementById('activeProjects').textContent=formatNumber(projects.length);
-document.getElementById('overallProgress').textContent=formatPercent(data.progress);
-document.getElementById('portfolioNcr').textContent=formatNcr(data);
-document.getElementById('totalIncidents').textContent=formatNumber(data.totalIncidents);
-document.getElementById('lowSeverityRate').textContent=formatNumber(Number(data.nearMiss||0)+Number(data.firstAid||0)+Number(data.mtc||0));
-document.getElementById('portfolioManhours').textContent=formatNumber(data.manhours);
+const displayed=projects.length;
+document.getElementById('activeProjects').textContent=formatNumber(displayed);
+const progressSummary=document.getElementById('progressSummary');
+const singleProject=currentSelection.project&&currentSelection.project!=='All Projects';
+progressSummary.classList.toggle('hidden',!singleProject);
+document.getElementById('overallProgress').textContent=singleProject?formatPercent(projects[0]&&projects[0].progress):'—';
+document.getElementById('portfolioNcr').textContent=formatNcrPortfolio(projects);
+const openNames=projects.filter(function(p){return getNcrOpen(p)>0}).map(function(p){return p.project||'Project'});
+document.getElementById('portfolioNcrOpen').textContent=openNames.length?'Open NCR: '+openNames.join(' • '):'No open NCRs';
+document.getElementById('lowSeverityRate').textContent=formatNumber(projects.reduce(function(sum,p){return sum+Number(p.nearMiss||0)+Number(p.firstAid||0)+Number(p.mtc||0)},0));
+document.getElementById('portfolioManhours').textContent=formatNumber(projects.reduce(function(sum,p){return sum+Number(p.manhours||0)},0));
+document.getElementById('portfolioSafetyManpower').textContent=formatNumber(projects.reduce(function(sum,p){return sum+Number(p.safety||0)},0));
 }
+function formatNcrPortfolio(projects){
+const closed=projects.reduce(function(sum,p){return sum+getNcrClosed(p)},0);
+const total=projects.reduce(function(sum,p){return sum+getNcrTotal(p)},0);
+return formatNumber(closed)+' / '+formatNumber(total);
+}
+
 function formatNcr(data){
 const closed=Number(data.ncrClosed!==undefined?data.ncrClosed:(data.ncr!==undefined?data.ncr:0))||0;
 const open=Number(data.ncrOpen!==undefined?data.ncrOpen:0)||0;
@@ -364,12 +462,13 @@ return formatNumber(closed)+' / 0';
 function renderProjects(projects){
 const container=document.getElementById('projects');
 destroyCharts();
+container.classList.toggle('singleMode',currentSelection.project&&currentSelection.project!=='All Projects'&&projects.length===1);
 if(!projects||projects.length===0){
 container.innerHTML='<div class="empty">No project data available for the selected filters.</div>';
 return;
 }
 container.innerHTML=projects.map(function(project,index){return createProjectCard(project,index)}).join('');
-projects.forEach(function(project,index){createMiniTrend(project,index)});
+projects.forEach(function(project,index){createSafetyTrend(project,index,currentSelection.project&&currentSelection.project!=='All Projects')});
 }
 function createProjectCard(p,index){
 const progress=clamp(Number(p.progress||0),0,100);
@@ -377,7 +476,10 @@ const lowCount=Number(p.nearMiss||0)+Number(p.firstAid||0)+Number(p.mtc||0);
 const seriousCount=Number(p.lti||0);
 const seriousRate=Number(p.seriousIncidentRate||0);
 const projectId='project_'+index;
-return '<div class="card project-card"><div class="ctop"><div class="pname">'+escapeHtml(p.project||'Project')+'</div><div class="status">'+getProjectStatus(progress,seriousRate)+'</div></div><div class="info"><div class="ring" style="--progress:'+progress*3.6+'deg"><b>'+formatPercent(progress)+'</b></div><div><div class="label">PROJECT PROGRESS</div><div class="value">'+formatPercent(progress)+'</div><div class="note">Real project progress from HSE project data.</div></div><div class="man"><div class="label">MANPOWER</div><div class="value">'+formatNumber(p.manpower)+'</div><div class="label" style="margin-top:5px">SAFETY</div><div class="value">'+formatNumber(p.safety)+'</div></div></div><div class="safety"><div class="shead"><b>SAFETY PERFORMANCE INDICATORS</b><span>Actual data</span></div><div class="bars">'+indicatorBar('Toolbox',p.toolbox,100,false)+indicatorBar('Training',p.training,100,false)+indicatorBar('NCR Closure',getNcrClosed(p),getNcrTotal(p),false,true)+indicatorBar('Actions',p.actions,100,false,true)+indicatorBar('Walkdowns',p.walkdowns,100,false,true)+indicatorBar('Low Severity',lowCount,rateScale(lowCount),true)+indicatorBar('Serious',seriousCount,rateScale(seriousCount),true)+'</div></div><div class="detailRow"><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>INCIDENT SUMMARY</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="grid8">'+mini('Near Miss',p.nearMiss)+mini('First Aid',p.firstAid)+mini('Medical Treatment',p.mtc)+mini('LTI',p.lti)+mini('Property Damage',p.property)+mini('Environmental',p.environment)+mini('Total Low Severity',lowCount)+mini('Total Serious',seriousCount)+'</div></div></div><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>HSE PERFORMANCE</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="summary"><strong>Safe Man-Hours:</strong> '+formatNumber(p.manhours)+'</div><div class="grid8">'+mini('NCR Closure',formatNcrProject(p))+mini('Action Tracking',p.actions)+mini('Walkdowns',p.walkdowns)+mini('Toolbox Talks',p.toolbox)+mini('Training',p.training)+mini('Manpower',p.manpower)+'</div></div></div></div><div class="trend"><div class="trendhead"><span>HSE PERFORMANCE TREND</span><span>Monthly</span></div><div class="chart"><canvas id="'+projectId+'"></canvas></div></div></div>';
+const safetyIndex=getSafetyIndex(p);
+const arrow=getSafetyDirection(p);
+const arrowClass=arrow==='up'?'up':arrow==='down'?'down':'flat';
+return '<div class="card project-card"><div class="ctop"><div class="pname projectLink" data-project="'+escapeHtml(p.project||'Project')+'" onclick="openSingleProjectFromElement(this)" title="Open '+escapeHtml(p.project||'Project')+'">'+escapeHtml(p.project||'Project')+'</div><div class="status">'+getProjectStatus(progress,seriousRate)+'</div></div><div class="info"><div class="ring" style="--progress:'+progress*3.6+'deg"><b>'+formatPercent(progress)+'</b></div><div><div class="label">PROJECT PROGRESS</div><div class="value">'+formatPercent(progress)+'</div><div class="note">Real project progress from HSE project data.</div></div><div class="man"><div class="label">MANPOWER</div><div class="value">'+formatNumber(p.manpower)+'</div><div class="label" style="margin-top:5px">SAFETY</div><div class="value">'+formatNumber(p.safety)+'</div></div></div><div class="safety"><div class="shead"><b>SAFETY PERFORMANCE INDICATORS</b><span>Actual data</span></div><div class="bars">'+indicatorBar('Toolbox',p.toolbox,100,false)+indicatorBar('Training',p.training,100,false)+indicatorBar('NCR Closure',getNcrClosed(p),getNcrTotal(p),false,true)+indicatorBar('Actions',p.actions,100,false,true)+indicatorBar('Walkdowns',p.walkdowns,100,false,true)+indicatorBar('Low Severity',lowCount,rateScale(lowCount),true)+indicatorBar('Serious',seriousCount,rateScale(seriousCount),true)+'</div></div><div class="detailRow"><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>INCIDENT SUMMARY</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="grid8">'+mini('Near Miss',p.nearMiss)+mini('First Aid',p.firstAid)+mini('Medical Treatment',p.mtc)+mini('LTI',p.lti)+mini('Property Damage',p.property)+mini('Environmental',p.environment)+mini('Total Low Severity',lowCount)+mini('Total Serious',seriousCount)+'</div></div></div><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>HSE PERFORMANCE</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="summary"><strong>Safe Man-Hours:</strong> '+formatNumber(p.manhours)+'</div><div class="grid8">'+mini('NCR Closure',formatNcrProject(p))+mini('Action Tracking',p.actions)+mini('Walkdowns',p.walkdowns)+mini('Toolbox Talks',p.toolbox)+mini('Training',p.training)+mini('Safety Index',safetyIndex===null?'N/A':formatPercent(safetyIndex))+'</div></div></div></div><div class="trend"><div class="trendhead"><span>HSE PERFORMANCE TREND</span><div class="trendheadRight"><span class="trendScoreBox">Safety Index <b>'+(safetyIndex===null?'N/A':formatPercent(safetyIndex))+'</b><span class="trendArrow '+arrowClass+'">'+(arrow==='up'?'↑':arrow==='down'?'↓':'→')+'</span></span><span>Monthly KPI View</span></div></div><div class="trendSnapshot">'+snapshot('Toolbox',p.toolbox)+snapshot('Training',p.training)+snapshot('NCR Closure',ncrPercent(p))+snapshot('Actions',p.actions)+snapshot('Walkdowns',p.walkdowns)+snapshot('Low Severity',lowCount,false)+'</div><div class="chart"><canvas id="'+projectId+'"></canvas></div><div id="trendNotice_'+index+'" class="trendNotice hidden"></div></div></div>';
 }
 function getNcrClosed(p){
 if(p.ncrClosed!==undefined)return Number(p.ncrClosed)||0;
@@ -410,16 +512,101 @@ return '<div class="kpi"><div class="pct">'+displayValue+'</div><div class="bara
 function mini(label,value){
 return '<div class="mini"><small>'+escapeHtml(label)+'</small><strong>'+formatDisplay(value)+'</strong></div>';
 }
-function createMiniTrend(p,index){
+function createSafetyTrend(p,index,large){
 const canvasId='project_'+index;
 const canvas=document.getElementById(canvasId);
 if(!canvas)return;
-const trend=Array.isArray(p.trend)?p.trend:[];
-const labels=trend.map(function(x){return x.month});
-const values=trend.map(function(x){return Number(x.progress||0)});
-if(!values.length)return;
-charts[canvasId]=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[{data:values,tension:.35,pointRadius:4,pointBackgroundColor:'#258b79',borderColor:'#258b79',borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false,beginAtZero:true,suggestedMax:100}}}});
+const trend=getSafetyTrendData(p);
+const notice=document.getElementById('trendNotice_'+index);
+if(!trend.length){
+if(notice){notice.textContent='Monthly safety KPI history is not available from the current API response. The dashboard will not invent trend values.';notice.classList.remove('hidden')}
+return;
 }
+const labels=trend.map(function(x){return x.month});
+const toolbox=trend.map(function(x){return safeNum(x.toolbox)});
+const training=trend.map(function(x){return safeNum(x.training)});
+const ncr=trend.map(function(x){return safeNum(x.ncrClosure)});
+const actions=trend.map(function(x){return safeNum(x.actions)});
+const walkdowns=trend.map(function(x){return safeNum(x.walkdowns)});
+const low=trend.map(function(x){return safeNum(x.lowSeverity)});
+const serious=trend.map(function(x){return safeNum(x.serious)});
+const score=trend.map(function(x){return x.safetyIndex==null?null:safeNum(x.safetyIndex)});
+const datasets=[
+{type:'line',label:'Toolbox %',data:toolbox,borderWidth:2,tension:.35,pointRadius:large?3:2},
+{type:'line',label:'Training %',data:training,borderWidth:2,tension:.35,pointRadius:large?3:2},
+{type:'line',label:'NCR Closure %',data:ncr,borderWidth:2,tension:.35,pointRadius:large?3:2},
+{type:'line',label:'Actions %',data:actions,borderWidth:2,tension:.35,pointRadius:large?3:2},
+{type:'line',label:'Walkdowns %',data:walkdowns,borderWidth:2,tension:.35,pointRadius:large?3:2},
+{type:'line',label:'Safety Index %',data:score,borderWidth:3,tension:.35,pointRadius:large?4:2},
+{type:'bar',label:'Low Severity',data:low,yAxisID:'incidents',borderRadius:3},
+{type:'bar',label:'Serious',data:serious,yAxisID:'incidents',borderRadius:3}
+];
+charts[canvasId]=new Chart(canvas,{
+data:{labels:labels,datasets:datasets},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+interaction:{mode:'index',intersect:false},
+plugins:{
+legend:{display:large,position:'bottom',labels:{boxWidth:10,font:{size:large?9:7}}},
+tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+formatNumber(ctx.parsed.y)}}}
+},
+scales:{
+x:{ticks:{font:{size:large?8:7},maxRotation:0},grid:{display:false}},
+y:{beginAtZero:true,max:100,title:{display:large,text:'KPI %',font:{size:9}}},
+incidents:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:large,text:'Incident Count',font:{size:9}}}
+},
+elements:{line:{fill:false}}
+}
+});
+}
+
+function getSafetyTrendData(p){
+let source=Array.isArray(p.safetyTrend)?p.safetyTrend:[];
+if(!source.length&&Array.isArray(p.trend)){
+const looksLikeSafety=p.trend.some(function(x){return x&&(['toolbox','training','actions','walkdowns','ncrClosure','ncrClosed','ncrTotal','lowSeverity','serious','safetyIndex'].some(function(k){return x[k]!==undefined}))});
+if(looksLikeSafety)source=p.trend;
+}
+return source.map(function(x){
+const ncr=ncrTrendValue(x);
+const metrics=[safeNum(x.toolbox),safeNum(x.training),ncr,safeNum(x.actions),safeNum(x.walkdowns)].filter(function(v){return v!==null});
+let index=x.safetyIndex==null?(metrics.length?metrics.reduce(function(a,b){return a+b},0)/metrics.length:null):safeNum(x.safetyIndex);
+return{month:x.month||x.label||'',toolbox:safeNum(x.toolbox),training:safeNum(x.training),ncrClosure:ncr,actions:safeNum(x.actions),walkdowns:safeNum(x.walkdowns),lowSeverity:safeNum(x.lowSeverity!==undefined?x.lowSeverity:Number(x.nearMiss||0)+Number(x.firstAid||0)+Number(x.mtc||0)),serious:safeNum(x.serious!==undefined?x.serious:x.lti),safetyIndex:index};
+}).filter(function(x){return x.month});
+}
+
+function safeNum(v){
+if(v===null||v===undefined||v==='')return null;
+const n=Number(v);return isFinite(n)?n:null;
+}
+
+function ncrTrendValue(x){
+if(x.ncrClosure!==undefined)return clamp(Number(x.ncrClosure)||0,0,100);
+const closed=Number(x.ncrClosed||0);const total=Number(x.ncrTotal||0);
+return total>0?closed/total*100:null;
+}
+
+function ncrPercent(p){
+const total=getNcrTotal(p);return total>0?getNcrClosed(p)/total*100:null;
+}
+
+function getSafetyIndex(p){
+if(p.safetyIndex!==undefined&&p.safetyIndex!==null&&isFinite(Number(p.safetyIndex)))return clamp(Number(p.safetyIndex),0,100);
+const values=[safeNum(p.toolbox),safeNum(p.training),ncrPercent(p),safeNum(p.actions),safeNum(p.walkdowns)].filter(function(v){return v!==null});
+return values.length?clamp(values.reduce(function(a,b){return a+b},0)/values.length,0,100):null;
+}
+
+function getSafetyDirection(p){
+const trend=getSafetyTrendData(p).filter(function(x){return x.safetyIndex!==null});
+if(trend.length<2)return'flat';
+const last=trend[trend.length-1].safetyIndex;const prev=trend[trend.length-2].safetyIndex;
+if(last>prev+0.5)return'up';if(last<prev-0.5)return'down';return'flat';
+}
+
+function snapshot(label,value,isPercent){
+return '<div class="snap"><small>'+escapeHtml(label)+'</small><strong>'+(value===null||value===undefined||value===''?'N/A':(isPercent===false?formatNumber(value):formatPercent(value)))+'</strong></div>';
+}
+
 function destroyCharts(){
 Object.keys(charts).forEach(function(key){
 if(charts[key]){
@@ -463,7 +650,46 @@ return Math.min(Math.max(Number(value)||0,min),max);
 function escapeHtml(value){
 return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
+function runComparison(){
+if(compareSelection.projects.length<2||!compareSelection.year)return;
+const error=document.getElementById('compareError');
+error.classList.add('hidden');
+document.getElementById('runCompareButton').disabled=true;
+document.getElementById('runCompareButton').textContent='Loading comparison...';
+const requests=compareSelection.projects.map(function(project){return callAPI('getDashboardData',{project:project,year:compareSelection.year,month:compareSelection.month},2,15000).then(function(data){if(!data||data.success===false)throw new Error(data&&data.error?data.error:'No data returned for '+project);const row=(Array.isArray(data.projectData)?data.projectData:[]).find(function(x){return x.project===project})||(Array.isArray(data.projectData)?data.projectData[0]:null);if(!row)throw new Error('No project data returned for '+project);return row;})});
+Promise.all(requests).then(function(rows){renderComparison(rows)}).catch(function(err){error.textContent=err.message||'Unable to load comparison data.';error.classList.remove('hidden')}).finally(function(){document.getElementById('runCompareButton').disabled=false;document.getElementById('runCompareButton').textContent='Compare Selected Projects';updateCompareRunState()});
+}
+
+function renderComparison(rows){
+const body=document.getElementById('compareTableBody');
+body.innerHTML=rows.map(function(p){
+const low=Number(p.nearMiss||0)+Number(p.firstAid||0)+Number(p.mtc||0);
+const ncr=ncrPercent(p);const score=getSafetyIndex(p);
+return '<tr><td><b>'+escapeHtml(p.project||'Project')+'</b></td><td>'+formatPercent(p.progress)+'</td><td>'+formatPercent(p.toolbox)+'</td><td>'+formatPercent(p.training)+'</td><td>'+(ncr===null?'N/A':formatPercent(ncr))+'</td><td>'+formatPercent(p.actions)+'</td><td>'+formatPercent(p.walkdowns)+'</td><td>'+formatNumber(low)+'</td><td>'+formatNumber(p.lti)+'</td><td>'+formatNumber(p.manhours)+'</td><td>'+formatNumber(p.safety)+'</td><td class="scoreCell">'+(score===null?'N/A':formatPercent(score))+'</td></tr>';
+}).join('');
+document.getElementById('compareResultMeta').textContent=compareSelection.year+' • '+(compareSelection.month==='All Months'?'All Year':compareSelection.month);
+document.getElementById('compareResults').classList.remove('hidden');
+renderComparisonChart(rows);
+}
+
+function renderComparisonChart(rows){
+if(compareChart)compareChart.destroy();
+const labels=rows.map(function(p){return p.project||'Project'});
+const metrics=function(p){return [Number(p.toolbox||0),Number(p.training||0),Number(ncrPercent(p)||0),Number(p.actions||0),Number(p.walkdowns||0),Number(getSafetyIndex(p)||0)]};
+const values=rows.map(metrics);
+const datasets=[
+{label:'Toolbox %',data:values.map(function(v){return v[0]}),borderWidth:1,borderRadius:4},
+{label:'Training %',data:values.map(function(v){return v[1]}),borderWidth:1,borderRadius:4},
+{label:'NCR Closure %',data:values.map(function(v){return v[2]}),borderWidth:1,borderRadius:4},
+{label:'Actions %',data:values.map(function(v){return v[3]}),borderWidth:1,borderRadius:4},
+{label:'Walkdowns %',data:values.map(function(v){return v[4]}),borderWidth:1,borderRadius:4},
+{label:'Safety Index %',data:values.map(function(v){return v[5]}),borderWidth:1,borderRadius:4}
+];
+compareChart=new Chart(document.getElementById('compareChart'),{type:'bar',data:{labels:labels,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:8}}}},scales:{x:{ticks:{font:{size:8}},grid:{display:false}},y:{beginAtZero:true,max:100,title:{display:true,text:'Performance %',font:{size:9}}}}}});
+}
+
 buildSelectionButtons();
+buildCompareSelectionButtons();
 showView('project');
 </script>
 </body>
