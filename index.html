@@ -1,696 +1,1116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<title>HSE Project Management Dashboard</title>
-<style>
-*{box-sizing:border-box;font-family:Arial,system-ui,sans-serif}
-body{margin:0;background:linear-gradient(135deg,#071f2b,#0d3542 55%,#123e48);color:#17242d;min-height:100vh}
-button,select{font-family:inherit}
-.hidden{display:none!important}
-header{padding:20px 24px 10px;color:#fff;display:flex;justify-content:space-between;align-items:center}
-h1{margin:0;font-size:24px}
-.sub{font-size:12px;color:#b9d0d6;margin-top:5px}
-.badge{background:#0b7f68;color:#fff;padding:9px 13px;border-radius:9px;font-size:10px;font-weight:800}
-.wrap{padding:10px 24px 24px;max-width:1800px;margin:auto}
-.selectionView{min-height:70vh;display:flex;align-items:center;justify-content:center}
-.selectionCard{width:min(950px,100%);background:#103845;border:1px solid #35606a;border-radius:22px;padding:30px;box-shadow:0 15px 45px #0005;color:#fff;text-align:center}
-.selectionTitle{font-size:24px;font-weight:900;margin-bottom:8px}
-.selectionSub{font-size:12px;color:#b9d0d6;margin-bottom:25px}
-.selectionGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.selectionButton{border:1px solid #47717a;background:#174653;color:#fff;border-radius:14px;padding:20px 10px;font-size:13px;font-weight:850;cursor:pointer;transition:.2s}
-.selectionButton:hover{background:#237060;transform:translateY(-2px)}
-.selectionButton.all{background:#0b7f68}
-.backButton{border:1px solid #52737b;background:transparent;color:#dcebed;border-radius:9px;padding:8px 14px;font-size:10px;font-weight:800;cursor:pointer;margin-bottom:15px}
-.backButton:hover{background:#174653}
-.selectionPath{font-size:11px;color:#b9d0d6;margin-bottom:20px}
-.periodGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.periodButton{border:1px solid #47717a;background:#174653;color:#fff;border-radius:10px;padding:12px 7px;font-size:10px;font-weight:800;cursor:pointer}
-.periodButton:hover{background:#237060}
-.periodButton.all{background:#0b7f68}
-.loadingView{min-height:65vh;display:flex;align-items:center;justify-content:center}
-.loadingCard{background:#103845;border:1px solid #35606a;border-radius:18px;padding:35px 50px;color:#fff;text-align:center}
-.spinner{width:34px;height:34px;border:4px solid #47717a;border-top-color:#4bd0a8;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
-.loadingText{font-size:12px;font-weight:800}
-@keyframes spin{to{transform:rotate(360deg)}}
-.errorBox{background:#4b2520;border:1px solid #b45b4b;color:#fff;border-radius:12px;padding:18px;text-align:center;margin:20px 0;font-size:11px}
-.dashboardTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.selectionInfo{color:#b9d0d6;font-size:10px}
-.changeButton{background:#0b7f68;border:0;color:#fff;padding:9px 13px;border-radius:9px;font-size:10px;font-weight:800;cursor:pointer}
-.changeButton:hover{background:#0f927a}
-.portfolio{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
-.sum{background:#103845;border:1px solid #35606a;border-radius:13px;padding:12px;color:#fff}
-.sum label{font-size:9px;color:#b8cdd2;font-weight:800}
-.sum strong{display:block;font-size:22px;margin:4px 0}
-.sum span{font-size:9px}
-.good{color:#4bd0a8}
-.warn{color:#ff9b78}
-.projects{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.card{background:#fff;border:1px solid #dbe4e8;border-radius:16px;padding:14px;box-shadow:0 7px 20px #0002}
-.project-card{min-width:0}
-.ctop{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.pname{font-size:15px;font-weight:850}
-.status{background:#e6f4ee;color:#217252;padding:5px 8px;border-radius:20px;font-size:8px;font-weight:800;white-space:nowrap}
-.info{display:grid;grid-template-columns:80px minmax(0,1fr) 100px;gap:14px;align-items:center;background:#f2f7f8;border-radius:12px;padding:12px;margin-top:10px}
-.ring{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(#258b79 var(--progress),#d8e4e8 0)}
-.ring:after{content:"";position:absolute;width:52px;height:52px;border-radius:50%;background:#f2f7f8}
-.ring b{position:relative;z-index:1;font-size:15px}
-.label{font-size:8px;color:#71808a;font-weight:900}
-.value{font-size:12px;font-weight:900;margin-top:3px}
-.note{font-size:9px;color:#52616c;line-height:1.35;margin-top:3px}
-.man{border-left:1px solid #d9e2e7;padding-left:12px}
-.man .label{font-weight:900}
-.safety{margin-top:11px;background:linear-gradient(135deg,#123847,#1d5960);color:#fff;border-radius:13px;padding:11px}
-.shead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.shead b{font-size:10px}
-.shead span{font-size:8px;color:#b9d8d8}
-.bars{height:174px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;align-items:stretch;border-bottom:1px solid #ffffff33}
-.kpi{height:100%;display:grid;grid-template-rows:20px 108px auto auto;align-items:end;text-align:center;min-width:0}
-.pct{font-size:9px;font-weight:850;align-self:end;margin-bottom:3px}
-.bararea{height:108px;width:100%;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
-.bar{width:24px;max-width:72%;height:calc(var(--h)*1%);max-height:100%;min-height:4px;border-radius:6px 6px 2px 2px;background:linear-gradient(#69cbb5,#258b79)}
-.incidentbar{background:linear-gradient(#f0a889,#c45d40)}
-.kname{font-size:7px;color:#d8e6e8;font-weight:800;line-height:1.15;margin-top:4px;min-height:18px}
-.count{font-size:9px;font-weight:850;margin-top:2px;min-height:11px}
-.detailRow{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
-.expand{background:#f8fafb;border:1px solid #dbe4e8;border-radius:11px;overflow:hidden}
-.expandHead{padding:9px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.expandHead b{font-size:9px;font-weight:900}
-.expandHead span{font-size:9px;font-weight:850}
-.arrow{font-size:12px;color:#6c7a83}
-.expandBody{display:none;padding:0 8px 8px}
-.expand.open .expandBody{display:block}
-.grid8{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
-.mini{background:#fff;border:1px solid #e4e9ec;border-radius:7px;padding:5px}
-.mini small{display:block;color:#74818a;font-size:7px;line-height:1.1;font-weight:800}
-.mini strong{font-size:11px;font-weight:900}
-.summary{font-size:8px;color:#52616c;background:#fff;border:1px solid #e4e9ec;border-radius:7px;padding:7px;margin-bottom:6px;line-height:1.35}
-.trend{margin-top:9px;background:linear-gradient(135deg,#eef6f7,#dce9ed);border:1px solid #cedde3;border-radius:11px;padding:9px}
-.trendhead{display:flex;justify-content:space-between;font-size:9px;font-weight:850}
-.chart{width:100%;height:50px;margin-top:3px}
-.empty{background:#fff;border-radius:14px;padding:40px;text-align:center;color:#6b7280;grid-column:1/-1}
-footer{text-align:center;color:#a8bdc3;font-size:8px;padding:4px 0 15px}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HSE Project Management Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: Arial, system-ui, sans-serif; }
+    body { margin: 0; background: linear-gradient(135deg, #071f2b, #0d3542 55%, #123e48); color: #17242d; min-height: 100vh; }
+    button, select { font-family: inherit; }
+    .hidden { display: none !important; }
 
-.compareEntry{margin-top:16px;width:100%;border:1px solid #4b8d91;background:#0b7f68;color:#fff;border-radius:12px;padding:12px;font-size:11px;font-weight:900;cursor:pointer;transition:.2s}.compareEntry:hover{background:#0f927a;transform:translateY(-1px)}
-.compareCard{max-width:1200px}.compareSectionTitle{text-align:left;font-size:10px;font-weight:900;color:#c3d9dd;margin:16px 0 8px}.compareProjectGrid{grid-template-columns:repeat(4,1fr)}.compareProjectButton{position:relative}.compareProjectButton.selected{background:#0b7f68;border-color:#69cbb5;box-shadow:0 0 0 2px #69cbb555 inset}.compareProjectButton.selected:after{content:'✓';position:absolute;top:7px;right:9px;font-size:12px;color:#fff}.compareRun{margin-top:16px;border:0;background:#258b79;color:#fff;border-radius:10px;padding:12px 18px;font-size:11px;font-weight:900;cursor:pointer}.compareRun:disabled{opacity:.45;cursor:not-allowed}.compareError{margin-top:12px;background:#4b2520;border:1px solid #b45b4b;color:#fff;padding:10px;border-radius:9px;font-size:10px}.compareResults{margin-top:20px;text-align:left;background:#fff;border-radius:15px;padding:14px;color:#17242d}.compareResultHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.compareResultHead b{font-size:13px}.compareResultHead span{display:block;font-size:9px;color:#71808a;margin-top:3px}.compareTableWrap{overflow:auto;border:1px solid #dbe4e8;border-radius:10px}.compareTable{width:100%;border-collapse:collapse;font-size:8px;min-width:1050px}.compareTable th,.compareTable td{padding:8px;border-bottom:1px solid #e7edf0;text-align:center;white-space:nowrap}.compareTable th{background:#f2f7f8;font-weight:900;color:#5e6c75}.compareTable td:first-child,.compareTable th:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:1}.compareTable .scoreCell{font-weight:900}.compareChartWrap{height:300px;margin-top:14px;background:linear-gradient(135deg,#eef6f7,#dce9ed);border:1px solid #cedde3;border-radius:12px;padding:10px}.compareChartWrap canvas{width:100%!important;height:100%!important}.projectLink{cursor:pointer}.projectLink:hover{text-decoration:underline;color:#147e6d}.singleMode .project-card{grid-column:1/-1}.singleMode .trend{padding:14px}.singleMode .chart{height:330px}.singleMode .safety{padding:14px}.singleMode .detailRow{grid-template-columns:1fr 1fr}.singleMode .trendhead{font-size:11px}.trendheadRight{display:flex;align-items:center;gap:8px}.trendScoreBox{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #d4e0e4;color:#42535d;border-radius:9px;padding:5px 8px}.trendScoreBox b{font-size:11px;color:#17242d}.trendArrow{font-size:14px;font-weight:900}.trendArrow.up{color:#1f936e}.trendArrow.down{color:#c65343}.trendArrow.flat{color:#7a8790}.trendNotice{margin-top:8px;background:#fff;border:1px dashed #c9d7dc;border-radius:8px;padding:8px;font-size:8px;color:#64737c}.trendSnapshot{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}.snap{background:#ffffffdd;border:1px solid #d5e1e5;border-radius:8px;padding:6px;text-align:center}.snap small{display:block;color:#71808a;font-size:7px;font-weight:800}.snap strong{display:block;font-size:10px;margin-top:2px}.singleMode .trendSnapshot{grid-template-columns:repeat(6,1fr)}
-@media(max-width:1200px){.projects{grid-template-columns:repeat(2,1fr)}.portfolio{grid-template-columns:repeat(3,1fr)}.selectionGrid{grid-template-columns:repeat(2,1fr)}}
-.compareProjectGrid{grid-template-columns:repeat(2,1fr)}.trendSnapshot,.singleMode .trendSnapshot{grid-template-columns:repeat(3,1fr)}.compareChartWrap{height:250px}.singleMode .chart{height:300px}
-@media(max-width:700px){header{padding:15px}.wrap{padding:8px 12px 20px}.projects{grid-template-columns:1fr}.portfolio{grid-template-columns:repeat(2,1fr)}.detailRow{grid-template-columns:1fr}.selectionCard{padding:20px}.selectionGrid{grid-template-columns:1fr}.periodGrid{grid-template-columns:repeat(2,1fr)}.selectionTitle{font-size:20px}.dashboardTop{align-items:flex-start;gap:10px}.selectionInfo{line-height:1.5}.info{grid-template-columns:72px minmax(0,1fr) 82px;gap:10px}}
-</style>
+    header { padding: 20px 24px 10px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    h1 { margin: 0; font-size: 24px; }
+    .sub { font-size: 12px; color: #b9d0d6; margin-top: 5px; }
+    .badge { background: #0b7f68; color: #fff; padding: 9px 13px; border-radius: 9px; font-size: 10px; font-weight: 800; }
+
+    .wrap { padding: 10px 24px 24px; max-width: 1800px; margin: auto; }
+    .selectionView, .loadingView { min-height: 70vh; display: flex; align-items: center; justify-content: center; }
+    .selectionCard { width: min(950px, 100%); background: #103845; border: 1px solid #35606a; border-radius: 22px; padding: 30px; box-shadow: 0 15px 45px #0005; color: #fff; text-align: center; }
+    
+    .selectionTitle { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+    .selectionSub { font-size: 12px; color: #b9d0d6; margin-bottom: 25px; }
+    .selectionGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    
+    .selectionButton { border: 1px solid #47717a; background: #174653; color: #fff; border-radius: 14px; padding: 20px 10px; font-size: 13px; font-weight: 850; cursor: pointer; transition: 0.2s; }
+    .selectionButton:hover { background: #237060; transform: translateY(-2px); }
+    .selectionButton.all { background: #0b7f68; }
+    
+    .backButton { border: 1px solid #52737b; background: transparent; color: #dcebed; border-radius: 9px; padding: 8px 14px; font-size: 10px; font-weight: 800; cursor: pointer; margin-bottom: 15px; }
+    .backButton:hover { background: #174653; }
+    .selectionPath { font-size: 11px; color: #b9d0d6; margin-bottom: 20px; }
+    
+    .periodGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+    .periodButton { border: 1px solid #47717a; background: #174653; color: #fff; border-radius: 10px; padding: 12px 7px; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+    .periodButton:hover { background: #237060; }
+    .periodButton.selected { background: #0b7f68; border-color: #69cbb5; box-shadow: 0 0 0 2px #69cbb555 inset; transform: translateY(-1px); }
+    .periodButton.all.selected { background: #0b7f68; }
+
+    .loadingCard { background: #103845; border: 1px solid #35606a; border-radius: 18px; padding: 35px 50px; color: #fff; text-align: center; }
+    .spinner { width: 34px; height: 34px; border: 4px solid #47717a; border-top-color: #4bd0a8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+    .loadingText { font-size: 12px; font-weight: 800; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .errorBox { background: #4b2520; border: 1px solid #b45b4b; color: #fff; border-radius: 12px; padding: 18px; text-align: center; margin: 20px 0; font-size: 11px; }
+
+    .dashboardTop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .selectionInfo { color: #b9d0d6; font-size: 10px; }
+    .changeButton { background: #0b7f68; border: 0; color: #fff; padding: 9px 13px; border-radius: 9px; font-size: 10px; font-weight: 800; cursor: pointer; }
+    .changeButton:hover { background: #0f927a; }
+
+    .portfolio { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 16px; }
+    .sum { background: #103845; border: 1px solid #35606a; border-radius: 13px; padding: 12px; color: #fff; }
+    .sum label { font-size: 9px; color: #b8cdd2; font-weight: 800; }
+    .sum strong { display: block; font-size: 22px; margin: 4px 0; }
+    .sum span { font-size: 9px; }
+    .good { color: #4bd0a8; }
+    .warn { color: #ff9b78; }
+
+    .projects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card { background: #fff; border: 1px solid #dbe4e8; border-radius: 16px; padding: 14px; box-shadow: 0 7px 20px #0002; }
+    .project-card { min-width: 0; }
+    .ctop { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .pname { font-size: 15px; font-weight: 850; }
+    .status { background: #e6f4ee; color: #217252; padding: 5px 8px; border-radius: 20px; font-size: 8px; font-weight: 800; white-space: nowrap; }
+
+    .info { display: grid; grid-template-columns: 80px minmax(0, 1fr) 100px; gap: 14px; align-items: center; background: #f2f7f8; border-radius: 12px; padding: 12px; margin-top: 10px; }
+    .ring { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; position: relative; background: conic-gradient(#258b79 var(--progress), #d8e4e8 0); }
+    .ring:after { content: ""; position: absolute; width: 52px; height: 52px; border-radius: 50%; background: #f2f7f8; }
+    .ring b { position: relative; z-index: 1; font-size: 15px; }
+    .label { font-size: 8px; color: #71808a; font-weight: 900; }
+    .value { font-size: 12px; font-weight: 900; margin-top: 3px; }
+    .note { font-size: 9px; color: #52616c; line-height: 1.35; margin-top: 3px; }
+    .man { border-left: 1px solid #d9e2e7; padding-left: 12px; }
+    .man .label { font-weight: 900; }
+
+    .safety { margin-top: 11px; background: linear-gradient(135deg, #123847, #1d5960); color: #fff; border-radius: 13px; padding: 11px; }
+    .shead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .shead b { font-size: 10px; }
+    .shead span { font-size: 8px; color: #b9d8d8; }
+
+    .bars { height: 174px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; align-items: stretch; border-bottom: 1px solid #ffffff33; }
+    .kpi { height: 100%; display: grid; grid-template-rows: 20px 108px auto auto; align-items: end; text-align: center; min-width: 0; }
+    .pct { font-size: 9px; font-weight: 850; align-self: end; margin-bottom: 3px; }
+    .bararea { height: 108px; width: 100%; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+    .bar { width: 24px; max-width: 72%; height: calc(var(--h) * 1%); max-height: 100%; min-height: 4px; border-radius: 6px 6px 2px 2px; background: linear-gradient(#69cbb5, #258b79); }
+    .incidentbar { background: linear-gradient(#f0a889, #c45d40); }
+    .kname { font-size: 7px; color: #d8e6e8; font-weight: 800; line-height: 1.15; margin-top: 4px; min-height: 18px; }
+    .count { font-size: 9px; font-weight: 850; margin-top: 2px; min-height: 11px; }
+
+    .singleKpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+    .singleKpi { background: #f5fbfa; border: 1px solid #d4e5e2; border-radius: 10px; padding: 10px; min-height: 76px; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+    .singleKpi .kpiLabel { font-size: 8px; font-weight: 900; color: #61747c; text-transform: uppercase; }
+    .singleKpi .kpiValue { font-size: 19px; font-weight: 900; color: #17242d; margin-top: 5px; }
+    .singleKpi .kpiMeta { font-size: 7px; color: #829097; margin-top: 3px; }
+    .singleKpi.positive { border-color: #a9ddd0; background: #f0fbf7; }
+    .singleKpi.negative { border-color: #efd0c4; background: #fff7f4; }
+    .singleKpi.score { border-color: #b9d8df; background: #f2f8fa; }
+
+    .detailRow { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 9px; }
+    .expand { background: #f8fafb; border: 1px solid #dbe4e8; border-radius: 11px; overflow: hidden; }
+    .expandHead { padding: 9px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .expandHead b { font-size: 9px; font-weight: 900; }
+    .expandHead span { font-size: 9px; font-weight: 850; }
+    .arrow { font-size: 12px; color: #6c7a83; }
+    .expandBody { display: none; padding: 0 8px 8px; }
+    .expand.open .expandBody { display: block; }
+    .grid8 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+    .mini { background: #fff; border: 1px solid #e4e9ec; border-radius: 7px; padding: 5px; }
+    .mini small { display: block; color: #74818a; font-size: 7px; line-height: 1.1; font-weight: 800; }
+    .mini strong { font-size: 11px; font-weight: 900; }
+
+    .summary { font-size: 8px; color: #52616c; background: #fff; border: 1px solid #e4e9ec; border-radius: 7px; padding: 7px; margin-bottom: 6px; line-height: 1.35; }
+    .trend { margin-top: 9px; background: linear-gradient(135deg, #eef6f7, #dce9ed); border: 1px solid #cedde3; border-radius: 11px; padding: 9px; }
+    .trendhead { display: flex; justify-content: space-between; font-size: 9px; font-weight: 850; }
+    .chart { width: 100%; height: 50px; margin-top: 3px; }
+    .empty { background: #fff; border-radius: 14px; padding: 40px; text-align: center; color: #6b7280; grid-column: 1 / -1; }
+    footer { text-align: center; color: #a8bdc3; font-size: 8px; padding: 4px 0 15px; }
+
+    .compareEntry { margin-top: 16px; width: 100%; border: 1px solid #4b8d91; background: #0b7f68; color: #fff; border-radius: 12px; padding: 12px; font-size: 11px; font-weight: 900; cursor: pointer; transition: 0.2s; }
+    .compareEntry:hover { background: #0f927a; transform: translateY(-1px); }
+    
+    .compareCard { max-width: 1200px; }
+    .compareSectionTitle { text-align: left; font-size: 10px; font-weight: 900; color: #c3d9dd; margin: 16px 0 8px; }
+    .compareProjectGrid { grid-template-columns: repeat(4, 1fr); }
+    .compareProjectButton { position: relative; }
+    .compareProjectButton.selected { background: #0b7f68; border-color: #69cbb5; box-shadow: 0 0 0 2px #69cbb555 inset; }
+    .compareProjectButton.selected:after { content: '✓'; position: absolute; top: 7px; right: 9px; font-size: 12px; color: #fff; }
+    .compareRun { margin-top: 16px; border: 0; background: #258b79; color: #fff; border-radius: 10px; padding: 12px 18px; font-size: 11px; font-weight: 900; cursor: pointer; }
+    .compareRun:disabled { opacity: 0.45; cursor: not-allowed; }
+    
+    .compareError { margin-top: 12px; background: #4b2520; border: 1px solid #b45b4b; color: #fff; padding: 10px; border-radius: 9px; font-size: 10px; }
+    .compareResults { margin-top: 20px; text-align: left; background: #fff; border-radius: 15px; padding: 14px; color: #17242d; }
+    .compareResultHead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .compareResultHead b { font-size: 13px; }
+    .compareResultHead span { display: block; font-size: 9px; color: #71808a; margin-top: 3px; }
+    
+    .compareTableWrap { overflow: auto; border: 1px solid #dbe4e8; border-radius: 10px; }
+    .compareTable { width: 100%; border-collapse: collapse; font-size: 8px; min-width: 1050px; }
+    .compareTable th, .compareTable td { padding: 8px; border-bottom: 1px solid #e7edf0; text-align: center; white-space: nowrap; }
+    .compareTable th { background: #f2f7f8; font-weight: 900; color: #5e6c75; }
+    .compareTable td:first-child, .compareTable th:first-child { text-align: left; position: sticky; left: 0; background: #fff; z-index: 1; }
+    .compareTable .scoreCell { font-weight: 900; }
+    
+    .compareChartWrap { height: 300px; margin-top: 14px; background: linear-gradient(135deg, #eef6f7, #dce9ed); border: 1px solid #cedde3; border-radius: 12px; padding: 10px; }
+    .compareChartWrap canvas { width: 100% !important; height: 100% !important; }
+    
+    .projectLink { cursor: pointer; }
+    .projectLink:hover { text-decoration: underline; color: #147e6d; }
+
+    .singleMode .project-card { grid-column: 1 / -1; }
+    .singleMode .trend { padding: 14px; }
+    .singleMode .chart { height: 330px; }
+    .singleMode .safety { padding: 14px; }
+    .singleMode .detailRow { grid-template-columns: 1fr 1fr; }
+    .singleMode .trendhead { font-size: 11px; }
+
+    .trendheadRight { display: flex; align-items: center; gap: 8px; }
+    .trendScoreBox { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #d4e0e4; color: #42535d; border-radius: 9px; padding: 5px 8px; }
+    .trendScoreBox b { font-size: 11px; color: #17242d; }
+    .trendArrow { font-size: 14px; font-weight: 900; }
+    .trendArrow.up { color: #1f936e; }
+    .trendArrow.down { color: #c65343; }
+    .trendArrow.flat { color: #7a8790; }
+    
+    .trendNotice { margin-top: 8px; background: #fff; border: 1px dashed #c9d7dc; border-radius: 8px; padding: 8px; font-size: 8px; color: #64737c; }
+    .trendSnapshot { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 8px; }
+    .snap { background: #ffffffdd; border: 1px solid #d5e1e5; border-radius: 8px; padding: 6px; text-align: center; }
+    .snap small { display: block; color: #71808a; font-size: 7px; font-weight: 800; }
+    .snap strong { display: block; font-size: 10px; margin-top: 2px; }
+    .singleMode .trendSnapshot { grid-template-columns: repeat(6, 1fr); }
+
+    @media (max-width: 1200px) {
+      .projects { grid-template-columns: repeat(2, 1fr); }
+      .portfolio { grid-template-columns: repeat(3, 1fr); }
+      .selectionGrid { grid-template-columns: repeat(2, 1fr); }
+      .singleKpis { grid-template-columns: repeat(3, 1fr); }
+    }
+    .compareProjectGrid { grid-template-columns: repeat(2, 1fr); }
+    .trendSnapshot, .singleMode .trendSnapshot { grid-template-columns: repeat(3, 1fr); }
+    .compareChartWrap { height: 250px; }
+    .singleMode .chart { height: 300px; }
+
+    @media (max-width: 700px) {
+      header { padding: 15px; }
+      .wrap { padding: 8px 12px 20px; }
+      .projects { grid-template-columns: 1fr; }
+      .portfolio { grid-template-columns: repeat(2, 1fr); }
+      .detailRow { grid-template-columns: 1fr; }
+      .selectionCard { padding: 20px; }
+      .selectionGrid { grid-template-columns: 1fr; }
+      .periodGrid { grid-template-columns: repeat(2, 1fr); }
+      .selectionTitle { font-size: 20px; }
+      .dashboardTop { align-items: flex-start; gap: 10px; }
+      .selectionInfo { line-height: 1.5; }
+      .info { grid-template-columns: 72px minmax(0, 1fr) 82px; gap: 10px; }
+      .singleKpis { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
+
 <header>
-<div>
-<h1>HSE PROJECT MANAGEMENT DASHBOARD</h1>
-<div class="sub">Rowad Modern Engineering • HSE Department</div>
-</div>
-<div class="badge">LIVE DATA</div>
+  <div>
+    <h1>HSE PROJECT MANAGEMENT DASHBOARD</h1>
+    <div class="sub">Rowad Modern Engineering • HSE Department</div>
+  </div>
+  <div class="badge">LIVE DATA</div>
 </header>
+
 <div class="wrap">
-<div id="projectView" class="selectionView">
-<div class="selectionCard">
-<div class="selectionTitle">Industrial Projects</div>
-<div class="selectionSub">Choose a project to continue</div>
-<div id="projectButtons" class="selectionGrid"></div>
-<button class="compareEntry" onclick="openCompareView()">↔ Compare Projects</button>
+  <div id="projectView" class="selectionView">
+    <div class="selectionCard">
+      <div class="selectionTitle">Industrial Projects</div>
+      <div class="selectionSub">Choose a project to continue</div>
+      <div id="projectButtons" class="selectionGrid"></div>
+      <button class="compareEntry" onclick="openCompareView()">↔ Compare Projects</button>
+    </div>
+  </div>
+
+  <div id="yearView" class="selectionView hidden">
+    <div class="selectionCard">
+      <button class="backButton" onclick="showView('project')">← Change Project</button>
+      <div id="yearTitle" class="selectionTitle">Select Year</div>
+      <div id="yearPath" class="selectionPath"></div>
+      <div class="selectionSub">Choose the reporting year</div>
+      <div id="yearButtons" class="selectionGrid"></div>
+    </div>
+  </div>
+
+  <div id="periodView" class="selectionView hidden">
+    <div class="selectionCard">
+      <button class="backButton" onclick="showView('year')">← Change Year</button>
+      <div id="periodTitle" class="selectionTitle">Select Period</div>
+      <div id="periodPath" class="selectionPath"></div>
+      <div class="selectionSub">Choose the reporting period</div>
+      <div id="periodButtons" class="periodGrid"></div>
+    </div>
+  </div>
+
+  <div id="compareView" class="selectionView hidden">
+    <div class="selectionCard compareCard">
+      <button class="backButton" onclick="showView('project')">← Back to Projects</button>
+      <div class="selectionTitle">Compare Projects</div>
+      <div class="selectionSub">Select two or more projects, then choose the reporting period.</div>
+
+      <div class="compareSectionTitle">Projects</div>
+      <div id="compareProjectButtons" class="selectionGrid compareProjectGrid"></div>
+
+      <div class="compareSectionTitle">Year</div>
+      <div id="compareYearButtons" class="periodGrid"></div>
+
+      <div class="compareSectionTitle">Period</div>
+      <div id="comparePeriodButtons" class="periodGrid"></div>
+
+      <button id="runCompareButton" class="compareRun" onclick="runComparison()" disabled>
+        Compare Selected Projects
+      </button>
+
+      <div id="compareError" class="compareError hidden"></div>
+
+      <div id="compareResults" class="compareResults hidden">
+        <div class="compareResultHead">
+          <div>
+            <b>Project Comparison</b>
+            <span id="compareResultMeta"></span>
+          </div>
+        </div>
+
+        <div class="compareTableWrap">
+          <table class="compareTable">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Progress</th>
+                <th>Toolbox</th>
+                <th>Training</th>
+                <th>NCR Closure</th>
+                <th>Actions</th>
+                <th>Walkdowns</th>
+                <th>Low Severity</th>
+                <th>Serious</th>
+                <th>Safety Man-Hours</th>
+                <th>Safety Manpower</th>
+                <th>Safety Index</th>
+              </tr>
+            </thead>
+            <tbody id="compareTableBody"></tbody>
+          </table>
+        </div>
+        <div class="compareChartWrap">
+          <canvas id="compareChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loadingView" class="loadingView hidden">
+    <div class="loadingCard">
+      <div class="spinner"></div>
+      <div id="loadingText" class="loadingText">Loading requested dashboard data...</div>
+    </div>
+  </div>
+
+  <div id="errorView" class="hidden">
+    <div id="errorBox" class="errorBox"></div>
+  </div>
+
+  <div id="dashboardView" class="hidden">
+    <div class="dashboardTop">
+      <div id="selectionInfo" class="selectionInfo"></div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+        <button class="changeButton" onclick="openCompareView()">↔ Compare</button>
+        <button class="changeButton" onclick="showView('project')">← Change Selection</button>
+      </div>
+    </div>
+
+    <div class="portfolio">
+      <div class="sum">
+        <label>PROJECTS DISPLAYED</label>
+        <strong id="activeProjects">0</strong>
+        <span class="good">Projects in view</span>
+      </div>
+      <div class="sum" id="progressSummary">
+        <label>PROJECT PROGRESS</label>
+        <strong id="overallProgress">0%</strong>
+        <span>Current project progress</span>
+      </div>
+      <div class="sum">
+        <label>NCR CLOSURE</label>
+        <strong id="portfolioNcr">0 / 0</strong>
+        <span class="good">Closed / Total</span>
+        <span id="portfolioNcrOpen" class="warn" style="display:block; margin-top:5px;"></span>
+      </div>
+      <div class="sum">
+        <label>TOTAL LOW SEVERITY INCIDENTS</label>
+        <strong id="lowSeverityRate">0</strong>
+        <span>Total low severity</span>
+      </div>
+      <div class="sum">
+        <label>SAFE MAN-HOURS</label>
+        <strong id="portfolioManhours">0</strong>
+        <span class="good">Total project man-hours</span>
+      </div>
+      <div class="sum">
+        <label>TOTAL SAFETY MANPOWER</label>
+        <strong id="portfolioSafetyManpower">0</strong>
+        <span class="good">Safety manpower in view</span>
+      </div>
+    </div>
+
+    <div class="projects" id="projects"></div>
+  </div>
 </div>
-</div>
-<div id="yearView" class="selectionView hidden">
-<div class="selectionCard">
-<button class="backButton" onclick="showView('project')">← Change Project</button>
-<div id="yearTitle" class="selectionTitle">Select Year</div>
-<div id="yearPath" class="selectionPath"></div>
-<div class="selectionSub">Choose the reporting year</div>
-<div id="yearButtons" class="selectionGrid"></div>
-</div>
-</div>
-<div id="periodView" class="selectionView hidden">
-<div class="selectionCard">
-<button class="backButton" onclick="showView('year')">← Change Year</button>
-<div id="periodTitle" class="selectionTitle">Select Period</div>
-<div id="periodPath" class="selectionPath"></div>
-<div class="selectionSub">Choose the reporting period</div>
-<div id="periodButtons" class="periodGrid"></div>
-</div>
-</div>
-<div id="compareView" class="selectionView hidden">
-<div class="selectionCard compareCard">
-<button class="backButton" onclick="showView('project')">← Back to Projects</button>
-<div class="selectionTitle">Compare Projects</div>
-<div class="selectionSub">Select two or more projects, then choose the reporting period.</div>
-<div class="compareSectionTitle">Projects</div>
-<div id="compareProjectButtons" class="selectionGrid compareProjectGrid"></div>
-<div class="compareSectionTitle">Year</div>
-<div id="compareYearButtons" class="periodGrid"></div>
-<div class="compareSectionTitle">Period</div>
-<div id="comparePeriodButtons" class="periodGrid"></div>
-<button id="runCompareButton" class="compareRun" onclick="runComparison()" disabled>Compare Selected Projects</button>
-<div id="compareError" class="compareError hidden"></div>
-<div id="compareResults" class="compareResults hidden">
-<div class="compareResultHead">
-<div><b>Project Comparison</b><span id="compareResultMeta"></span></div>
-</div>
-<div class="compareTableWrap"><table class="compareTable"><thead><tr><th>Project</th><th>Progress</th><th>Toolbox</th><th>Training</th><th>NCR Closure</th><th>Actions</th><th>Walkdowns</th><th>Low Severity</th><th>Serious</th><th>Safety Man-Hours</th><th>Safety Manpower</th><th>Safety Index</th></tr></thead><tbody id="compareTableBody"></tbody></table></div>
-<div class="compareChartWrap"><canvas id="compareChart"></canvas></div>
-</div>
-</div>
-</div>
-<div id="loadingView" class="loadingView hidden">
-<div class="loadingCard">
-<div class="spinner"></div>
-<div id="loadingText" class="loadingText">Loading requested dashboard data...</div>
-</div>
-</div>
-<div id="errorView" class="hidden">
-<div id="errorBox" class="errorBox"></div>
-</div>
-<div id="dashboardView" class="hidden">
-<div class="dashboardTop">
-<div id="selectionInfo" class="selectionInfo"></div>
-<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-<button class="changeButton" onclick="openCompareView()">↔ Compare</button>
-<button class="changeButton" onclick="showView('project')">← Change Selection</button>
-</div>
-</div>
-<div class="portfolio">
-<div class="sum">
-<label>PROJECTS DISPLAYED</label>
-<strong id="activeProjects">0</strong>
-<span class="good">Projects in view</span>
-</div>
-<div class="sum" id="progressSummary">
-<label>PROJECT PROGRESS</label>
-<strong id="overallProgress">0%</strong>
-<span>Current project progress</span>
-</div>
-<div class="sum">
-<label>NCR CLOSURE</label>
-<strong id="portfolioNcr">0 / 0</strong>
-<span class="good">Closed / Total</span>
-<span id="portfolioNcrOpen" class="warn" style="display:block;margin-top:5px"></span>
-</div>
-<div class="sum">
-<label>TOTAL LOW SEVERITY INCIDENTS</label>
-<strong id="lowSeverityRate">0</strong>
-<span>Total low severity</span>
-</div>
-<div class="sum">
-<label>SAFE MAN-HOURS</label>
-<strong id="portfolioManhours">0</strong>
-<span class="good">Total project man-hours</span>
-</div>
-<div class="sum">
-<label>TOTAL SAFETY MANPOWER</label>
-<strong id="portfolioSafetyManpower">0</strong>
-<span class="good">Safety manpower in view</span>
-</div>
-</div>
-<div class="projects" id="projects"></div>
-</div>
-</div>
+
 <footer>Management View • Live HSE Project Data</footer>
+
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbxeHHFR0pAMSjxS986ODCgIIsK_5nwgWH_UXdPeJCXAp3yVc5WJmdDv0Rf0s6WzysZo/exec';
-const PROJECTS=['Sokhna port development project','EGAT','AS2','Grain Bulk Terminal','Open Channel','Alstom','Yada'];
-const YEARS=['2026','2027','2028'];
-const MONTHS=[{value:'All Months',label:'All Year'},{value:'January',label:'January'},{value:'February',label:'February'},{value:'March',label:'March'},{value:'April',label:'April'},{value:'May',label:'May'},{value:'June',label:'June'},{value:'July',label:'July'},{value:'August',label:'August'},{value:'September',label:'September'},{value:'October',label:'October'},{value:'November',label:'November'},{value:'December',label:'December'}];
-let charts={};
-let jsonpCounter=0;
-let currentSelection={project:'',year:'',month:'All Months'};
-let compareSelection={projects:[],year:'',month:'All Months'};
-let compareChart=null;
-let requestToken=0;
-function showView(view){
-document.getElementById('projectView').classList.add('hidden');
-document.getElementById('yearView').classList.add('hidden');
-document.getElementById('periodView').classList.add('hidden');
-document.getElementById('compareView').classList.add('hidden');
-document.getElementById('loadingView').classList.add('hidden');
-document.getElementById('dashboardView').classList.add('hidden');
-document.getElementById('errorView').classList.add('hidden');
-if(view==='project')document.getElementById('projectView').classList.remove('hidden');
-if(view==='year')document.getElementById('yearView').classList.remove('hidden');
-if(view==='period')document.getElementById('periodView').classList.remove('hidden');
-if(view==='compare')document.getElementById('compareView').classList.remove('hidden');
-if(view==='loading')document.getElementById('loadingView').classList.remove('hidden');
-if(view==='dashboard')document.getElementById('dashboardView').classList.remove('hidden');
-if(view==='project'){
-currentSelection={project:'',year:'',month:'All Months'};
-destroyCharts();
-resetCompareView();
-}
-}
-function buildSelectionButtons(){
-const projectContainer=document.getElementById('projectButtons');
-projectContainer.innerHTML='';
-PROJECTS.forEach(function(project){
-const button=document.createElement('button');
-button.className='selectionButton';
-button.textContent=project;
-button.onclick=function(){selectProject(project)};
-projectContainer.appendChild(button);
-});
-const allButton=document.createElement('button');
-allButton.className='selectionButton all';
-allButton.textContent='All Projects';
-allButton.onclick=function(){selectProject('All Projects')};
-projectContainer.appendChild(allButton);
-const yearContainer=document.getElementById('yearButtons');
-yearContainer.innerHTML='';
-YEARS.forEach(function(year){
-const button=document.createElement('button');
-button.className='selectionButton';
-button.textContent=year;
-button.onclick=function(){selectYear(year)};
-yearContainer.appendChild(button);
-});
-const allYears=document.createElement('button');
-allYears.className='selectionButton all';
-allYears.textContent='All Years';
-allYears.onclick=function(){selectYear('All Years')};
-yearContainer.appendChild(allYears);
-const periodContainer=document.getElementById('periodButtons');
-periodContainer.innerHTML='';
-MONTHS.forEach(function(month){
-const button=document.createElement('button');
-button.className='periodButton'+(month.value==='All Months'?' all':'');
-button.textContent=month.label;
-button.onclick=function(){selectPeriod(month.value)};
-periodContainer.appendChild(button);
-});
-}
-function buildCompareSelectionButtons(){
-const pc=document.getElementById('compareProjectButtons');
-const yc=document.getElementById('compareYearButtons');
-const mc=document.getElementById('comparePeriodButtons');
-pc.innerHTML='';yc.innerHTML='';mc.innerHTML='';
-PROJECTS.forEach(function(project){
-const b=document.createElement('button');
-b.className='selectionButton compareProjectButton'+(compareSelection.projects.includes(project)?' selected':'');
-b.textContent=project;b.onclick=function(){toggleCompareProject(project)};pc.appendChild(b);
-});
-const all=document.createElement('button');all.className='selectionButton compareProjectButton all'+(compareSelection.projects.length===PROJECTS.length?' selected':'');all.textContent='All Projects';all.onclick=function(){compareSelection.projects=PROJECTS.slice();buildCompareSelectionButtons()};pc.appendChild(all);
-YEARS.forEach(function(year){const b=document.createElement('button');b.className='periodButton'+(compareSelection.year===year?' all':'');b.textContent=year;b.onclick=function(){compareSelection.year=year;buildCompareSelectionButtons();updateCompareRunState()};yc.appendChild(b)});
-const ay=document.createElement('button');ay.className='periodButton all'+(compareSelection.year==='All Years'?' selected':'');ay.textContent='All Years';ay.onclick=function(){compareSelection.year='All Years';buildCompareSelectionButtons();updateCompareRunState()};yc.appendChild(ay);
-MONTHS.forEach(function(month){const b=document.createElement('button');b.className='periodButton'+(month.value==='All Months'?' all':'')+(compareSelection.month===month.value?' selected':'');b.textContent=month.label;b.onclick=function(){compareSelection.month=month.value;buildCompareSelectionButtons();updateCompareRunState()};mc.appendChild(b)});
-updateCompareRunState();
-}
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxeHHFR0pAMSjxS986ODCgIIsK_5nwgWH_UXdPeJCXAp3yVc5WJmdDv0Rf0s6WzysZo/exec';
 
-function toggleCompareProject(project){
-const index=compareSelection.projects.indexOf(project);
-if(index>=0)compareSelection.projects.splice(index,1);else compareSelection.projects.push(project);
-buildCompareSelectionButtons();
-}
+  const PROJECTS = [
+    'Sokhna port development project',
+    'EGAT',
+    'AS2',
+    'Grain Bulk Terminal',
+    'Open Channel',
+    'Alstom',
+    'Yada'
+  ];
 
-function openCompareView(){
-compareSelection={projects:PROJECTS.slice(),year:currentSelection.year||'All Years',month:currentSelection.month||'All Months'};
-document.getElementById('compareResults').classList.add('hidden');
-document.getElementById('compareError').classList.add('hidden');
-showView('compare');
-buildCompareSelectionButtons();
-}
+  const YEARS = ['2026', '2027', '2028'];
 
-function resetCompareView(){
-if(compareChart){compareChart.destroy();compareChart=null}
-const results=document.getElementById('compareResults');if(results)results.classList.add('hidden');
-const err=document.getElementById('compareError');if(err){err.classList.add('hidden');err.textContent=''}
-}
+  const MONTHS = [
+    { value: 'All Months', label: 'All Year' },
+    { value: 'January', label: 'January' },
+    { value: 'February', label: 'February' },
+    { value: 'March', label: 'March' },
+    { value: 'April', label: 'April' },
+    { value: 'May', label: 'May' },
+    { value: 'June', label: 'June' },
+    { value: 'July', label: 'July' },
+    { value: 'August', label: 'August' },
+    { value: 'September', label: 'September' },
+    { value: 'October', label: 'October' },
+    { value: 'November', label: 'November' },
+    { value: 'December', label: 'December' }
+  ];
 
-function updateCompareRunState(){
-const btn=document.getElementById('runCompareButton');
-if(!btn)return;
-btn.disabled=compareSelection.projects.length<2||!compareSelection.year;
-}
+  const INCIDENT_DEDUCTION_PER_EVENT = 20;
 
-function selectProject(project){
-currentSelection.project=project;
-currentSelection.year='';
-currentSelection.month='All Months';
-document.getElementById('yearTitle').textContent='Select Year';
-document.getElementById('yearPath').textContent=project;
-showView('year');
-}
-function selectYear(year){
-currentSelection.year=year;
-currentSelection.month='All Months';
-document.getElementById('periodTitle').textContent='Select Period';
-document.getElementById('periodPath').textContent=currentSelection.project+' • '+year;
-showView('period');
-}
-function selectPeriod(month){
-currentSelection.month=month;
-loadDashboard();
-}
-function openSingleProject(project){
-currentSelection.project=project;
-loadDashboard();
-}
+  const TBT_FIRST_BLOCK_COUNT = 4;
+  const TBT_FIRST_BLOCK_SCORE = 20;
+  const TBT_SECOND_BLOCK_COUNT = 4;
+  const TBT_SECOND_BLOCK_SCORE = 2.5;
+  const TBT_THIRD_BLOCK_COUNT = 50;
+  const TBT_THIRD_BLOCK_SCORE = 1;
 
-function openSingleProjectFromElement(element){openSingleProject(element&&element.dataset?element.dataset.project:'');}
+  const WALKDOWN_FIRST_COUNT = 3;
+  const WALKDOWN_FIRST_SCORE = 75;
+  const WALKDOWN_AFTER_SCORE = 5;
 
-function loadDashboard(){
-const token=++requestToken;
-showView('loading');
-document.getElementById('loadingText').textContent='Loading '+(currentSelection.project==='All Projects'?'all projects':currentSelection.project)+' • '+currentSelection.year+' • '+(currentSelection.month==='All Months'?'All Year':currentSelection.month);
-callAPI('getDashboardData',{project:currentSelection.project,year:currentSelection.year,month:currentSelection.month},2,15000).then(function(data){
-if(token!==requestToken)return;
-if(!data||data.success===false)throw new Error(data&&data.error?data.error:'No dashboard data returned.');
-updateDashboard(data);
-document.getElementById('selectionInfo').textContent=currentSelection.project+' • '+currentSelection.year+' • '+(currentSelection.month==='All Months'?'All Year':currentSelection.month);
-showView('dashboard');
-}).catch(function(error){
-if(token!==requestToken)return;
-showError(error.message||'Unable to load dashboard data.');
-});
-}
-function showError(message){
-document.getElementById('errorBox').innerHTML=escapeHtml(message)+'<br><button class="changeButton" style="margin-top:12px" onclick="showView(\'period\')">Back to Selection</button>';
-document.getElementById('errorView').classList.remove('hidden');
-document.getElementById('loadingView').classList.add('hidden');
-}
-function callAPI(action,params={},retries=2,timeout=15000){
-return new Promise(function(resolve,reject){
-let attempts=0;
-function request(){
-attempts++;
-const callbackName='__hse_callback_'+Date.now()+'_'+(++jsonpCounter);
-const script=document.createElement('script');
-const queryParams=new URLSearchParams();
-queryParams.set('action',action);
-queryParams.set('callback',callbackName);
-Object.keys(params).forEach(function(key){queryParams.set(key,params[key]);});
-script.src=API_URL+'?'+queryParams.toString();
-let completed=false;
-const timer=setTimeout(function(){
-if(completed)return;
-completed=true;
-cleanup();
-if(attempts<=retries){
-setTimeout(request,500*attempts);
-}else{
-reject(new Error('Dashboard API timeout. Please try again.'));
-}
-},timeout);
-function cleanup(){
-clearTimeout(timer);
-delete window[callbackName];
-if(script.parentNode)script.parentNode.removeChild(script);
-}
-window[callbackName]=function(data){
-if(completed)return;
-completed=true;
-cleanup();
-if(data&&data.success===false){
-if(attempts<=retries){
-setTimeout(request,500*attempts);
-}else{
-reject(new Error(data.error||'API Error'));
-}
-return;
-}
-resolve(data);
-};
-script.onerror=function(){
-if(completed)return;
-completed=true;
-cleanup();
-if(attempts<=retries){
-setTimeout(request,500*attempts);
-}else{
-reject(new Error('Unable to connect to HSE Dashboard API.'));
-}
-};
-document.body.appendChild(script);
-}
-request();
-});
-}
-function updateDashboard(data){
-const projects=Array.isArray(data.projectData)?data.projectData:[];
-updatePortfolio(data,projects);
-renderProjects(projects);
-}
-function updatePortfolio(data,projects){
-const displayed=projects.length;
-document.getElementById('activeProjects').textContent=formatNumber(displayed);
-const progressSummary=document.getElementById('progressSummary');
-const singleProject=currentSelection.project&&currentSelection.project!=='All Projects';
-progressSummary.classList.toggle('hidden',!singleProject);
-document.getElementById('overallProgress').textContent=singleProject?formatPercent(projects[0]&&projects[0].progress):'—';
-document.getElementById('portfolioNcr').textContent=formatNcrPortfolio(projects);
-const openNames=projects.filter(function(p){return getNcrOpen(p)>0}).map(function(p){return p.project||'Project'});
-document.getElementById('portfolioNcrOpen').textContent=openNames.length?'Open NCR: '+openNames.join(' • '):'No open NCRs';
-document.getElementById('lowSeverityRate').textContent=formatNumber(projects.reduce(function(sum,p){return sum+Number(p.nearMiss||0)+Number(p.firstAid||0)+Number(p.mtc||0)},0));
-document.getElementById('portfolioManhours').textContent=formatNumber(projects.reduce(function(sum,p){return sum+Number(p.manhours||0)},0));
-document.getElementById('portfolioSafetyManpower').textContent=formatNumber(projects.reduce(function(sum,p){return sum+Number(p.safety||0)},0));
-}
-function formatNcrPortfolio(projects){
-const closed=projects.reduce(function(sum,p){return sum+getNcrClosed(p)},0);
-const total=projects.reduce(function(sum,p){return sum+getNcrTotal(p)},0);
-return formatNumber(closed)+' / '+formatNumber(total);
-}
+  const ACTION_FIRST_COUNT = 3;
+  const ACTION_FIRST_SCORE = 25;
+  const ACTION_AFTER_SCORE = 5;
 
-function formatNcr(data){
-const closed=Number(data.ncrClosed!==undefined?data.ncrClosed:(data.ncr!==undefined?data.ncr:0))||0;
-const open=Number(data.ncrOpen!==undefined?data.ncrOpen:0)||0;
-const total=closed+open;
-if(data.ncrOpen!==undefined)return formatNumber(closed)+' / '+formatNumber(total);
-return formatNumber(closed)+' / 0';
-}
-function renderProjects(projects){
-const container=document.getElementById('projects');
-destroyCharts();
-container.classList.toggle('singleMode',currentSelection.project&&currentSelection.project!=='All Projects'&&projects.length===1);
-if(!projects||projects.length===0){
-container.innerHTML='<div class="empty">No project data available for the selected filters.</div>';
-return;
-}
-container.innerHTML=projects.map(function(project,index){return createProjectCard(project,index)}).join('');
-projects.forEach(function(project,index){createSafetyTrend(project,index,currentSelection.project&&currentSelection.project!=='All Projects')});
-}
-function createProjectCard(p,index){
-const progress=clamp(Number(p.progress||0),0,100);
-const lowCount=Number(p.nearMiss||0)+Number(p.firstAid||0)+Number(p.mtc||0);
-const seriousCount=Number(p.lti||0);
-const seriousRate=Number(p.seriousIncidentRate||0);
-const projectId='project_'+index;
-const safetyIndex=getSafetyIndex(p);
-const arrow=getSafetyDirection(p);
-const arrowClass=arrow==='up'?'up':arrow==='down'?'down':'flat';
-return '<div class="card project-card"><div class="ctop"><div class="pname projectLink" data-project="'+escapeHtml(p.project||'Project')+'" onclick="openSingleProjectFromElement(this)" title="Open '+escapeHtml(p.project||'Project')+'">'+escapeHtml(p.project||'Project')+'</div><div class="status">'+getProjectStatus(progress,seriousRate)+'</div></div><div class="info"><div class="ring" style="--progress:'+progress*3.6+'deg"><b>'+formatPercent(progress)+'</b></div><div><div class="label">PROJECT PROGRESS</div><div class="value">'+formatPercent(progress)+'</div><div class="note">Real project progress from HSE project data.</div></div><div class="man"><div class="label">MANPOWER</div><div class="value">'+formatNumber(p.manpower)+'</div><div class="label" style="margin-top:5px">SAFETY</div><div class="value">'+formatNumber(p.safety)+'</div></div></div><div class="safety"><div class="shead"><b>SAFETY PERFORMANCE INDICATORS</b><span>Actual data</span></div><div class="bars">'+indicatorBar('Toolbox',p.toolbox,100,false)+indicatorBar('Training',p.training,100,false)+indicatorBar('NCR Closure',getNcrClosed(p),getNcrTotal(p),false,true)+indicatorBar('Actions',p.actions,100,false,true)+indicatorBar('Walkdowns',p.walkdowns,100,false,true)+indicatorBar('Low Severity',lowCount,rateScale(lowCount),true)+indicatorBar('Serious',seriousCount,rateScale(seriousCount),true)+'</div></div><div class="detailRow"><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>INCIDENT SUMMARY</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="grid8">'+mini('Near Miss',p.nearMiss)+mini('First Aid',p.firstAid)+mini('Medical Treatment',p.mtc)+mini('LTI',p.lti)+mini('Property Damage',p.property)+mini('Environmental',p.environment)+mini('Total Low Severity',lowCount)+mini('Total Serious',seriousCount)+'</div></div></div><div class="expand" onclick="toggleExpand(this)"><div class="expandHead"><b>HSE PERFORMANCE</b><span><span class="arrow">▼</span></span></div><div class="expandBody"><div class="summary"><strong>Safe Man-Hours:</strong> '+formatNumber(p.manhours)+'</div><div class="grid8">'+mini('NCR Closure',formatNcrProject(p))+mini('Action Tracking',p.actions)+mini('Walkdowns',p.walkdowns)+mini('Toolbox Talks',p.toolbox)+mini('Training',p.training)+mini('Safety Index',safetyIndex===null?'N/A':formatPercent(safetyIndex))+'</div></div></div></div><div class="trend"><div class="trendhead"><span>HSE PERFORMANCE TREND</span><div class="trendheadRight"><span class="trendScoreBox">Safety Index <b>'+(safetyIndex===null?'N/A':formatPercent(safetyIndex))+'</b><span class="trendArrow '+arrowClass+'">'+(arrow==='up'?'↑':arrow==='down'?'↓':'→')+'</span></span><span>Monthly KPI View</span></div></div><div class="trendSnapshot">'+snapshot('Toolbox',p.toolbox)+snapshot('Training',p.training)+snapshot('NCR Closure',ncrPercent(p))+snapshot('Actions',p.actions)+snapshot('Walkdowns',p.walkdowns)+snapshot('Low Severity',lowCount,false)+'</div><div class="chart"><canvas id="'+projectId+'"></canvas></div><div id="trendNotice_'+index+'" class="trendNotice hidden"></div></div></div>';
-}
-function getNcrClosed(p){
-if(p.ncrClosed!==undefined)return Number(p.ncrClosed)||0;
-return Number(p.ncr||0)||0;
-}
-function getNcrOpen(p){
-if(p.ncrOpen!==undefined)return Number(p.ncrOpen)||0;
-return 0;
-}
-function getNcrTotal(p){
-return getNcrClosed(p)+getNcrOpen(p);
-}
-function formatNcrProject(p){
-return formatNumber(getNcrClosed(p))+' / '+formatNumber(getNcrTotal(p));
-}
-function indicatorBar(name,value,scale,isIncident,forceNumber){
-const numeric=Number(value||0);
-const safeScale=Number(scale||0);
-const height=safeScale>0?clamp(numeric/safeScale*100,2,100):2;
-let displayValue;
-if(name==='NCR Closure'){
-displayValue=formatNumber(numeric)+' / '+formatNumber(safeScale);
-}else if(isIncident||forceNumber){
-displayValue=formatNumber(numeric);
-}else{
-displayValue=formatPercent(numeric);
-}
-return '<div class="kpi"><div class="pct">'+displayValue+'</div><div class="bararea"><div class="'+(isIncident?'bar incidentbar':'bar')+'" style="--h:'+height+'"></div></div><div class="kname">'+escapeHtml(name)+'</div><div class="count">'+(isIncident?'Count':name==='NCR Closure'? 'Closed / Total':formatNumber(numeric))+'</div></div>';
-}
-function mini(label,value){
-return '<div class="mini"><small>'+escapeHtml(label)+'</small><strong>'+formatDisplay(value)+'</strong></div>';
-}
-function createSafetyTrend(p,index,large){
-const canvasId='project_'+index;
-const canvas=document.getElementById(canvasId);
-if(!canvas)return;
-const trend=getSafetyTrendData(p);
-const notice=document.getElementById('trendNotice_'+index);
-if(!trend.length){
-if(notice){notice.textContent='Monthly safety KPI history is not available from the current API response. The dashboard will not invent trend values.';notice.classList.remove('hidden')}
-return;
-}
-const labels=trend.map(function(x){return x.month});
-const toolbox=trend.map(function(x){return safeNum(x.toolbox)});
-const training=trend.map(function(x){return safeNum(x.training)});
-const ncr=trend.map(function(x){return safeNum(x.ncrClosure)});
-const actions=trend.map(function(x){return safeNum(x.actions)});
-const walkdowns=trend.map(function(x){return safeNum(x.walkdowns)});
-const low=trend.map(function(x){return safeNum(x.lowSeverity)});
-const serious=trend.map(function(x){return safeNum(x.serious)});
-const score=trend.map(function(x){return x.safetyIndex==null?null:safeNum(x.safetyIndex)});
-const datasets=[
-{type:'line',label:'Toolbox %',data:toolbox,borderWidth:2,tension:.35,pointRadius:large?3:2},
-{type:'line',label:'Training %',data:training,borderWidth:2,tension:.35,pointRadius:large?3:2},
-{type:'line',label:'NCR Closure %',data:ncr,borderWidth:2,tension:.35,pointRadius:large?3:2},
-{type:'line',label:'Actions %',data:actions,borderWidth:2,tension:.35,pointRadius:large?3:2},
-{type:'line',label:'Walkdowns %',data:walkdowns,borderWidth:2,tension:.35,pointRadius:large?3:2},
-{type:'line',label:'Safety Index %',data:score,borderWidth:3,tension:.35,pointRadius:large?4:2},
-{type:'bar',label:'Low Severity',data:low,yAxisID:'incidents',borderRadius:3},
-{type:'bar',label:'Serious',data:serious,yAxisID:'incidents',borderRadius:3}
-];
-charts[canvasId]=new Chart(canvas,{
-data:{labels:labels,datasets:datasets},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-interaction:{mode:'index',intersect:false},
-plugins:{
-legend:{display:large,position:'bottom',labels:{boxWidth:10,font:{size:large?9:7}}},
-tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+formatNumber(ctx.parsed.y)}}}
-},
-scales:{
-x:{ticks:{font:{size:large?8:7},maxRotation:0},grid:{display:false}},
-y:{beginAtZero:true,max:100,title:{display:large,text:'KPI %',font:{size:9}}},
-incidents:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:large,text:'Incident Count',font:{size:9}}}
-},
-elements:{line:{fill:false}}
-}
-});
-}
+  let charts = {};
+  let jsonpCounter = 0;
+  let currentSelection = { project: '', year: '', month: 'All Months' };
+  let compareSelection = { projects: [], year: '', month: 'All Months' };
+  let compareChart = null;
+  let requestToken = 0;
 
-function getSafetyTrendData(p){
-let source=Array.isArray(p.safetyTrend)?p.safetyTrend:[];
-if(!source.length&&Array.isArray(p.trend)){
-const looksLikeSafety=p.trend.some(function(x){return x&&(['toolbox','training','actions','walkdowns','ncrClosure','ncrClosed','ncrTotal','lowSeverity','serious','safetyIndex'].some(function(k){return x[k]!==undefined}))});
-if(looksLikeSafety)source=p.trend;
-}
-return source.map(function(x){
-const ncr=ncrTrendValue(x);
-const metrics=[safeNum(x.toolbox),safeNum(x.training),ncr,safeNum(x.actions),safeNum(x.walkdowns)].filter(function(v){return v!==null});
-let index=x.safetyIndex==null?(metrics.length?metrics.reduce(function(a,b){return a+b},0)/metrics.length:null):safeNum(x.safetyIndex);
-return{month:x.month||x.label||'',toolbox:safeNum(x.toolbox),training:safeNum(x.training),ncrClosure:ncr,actions:safeNum(x.actions),walkdowns:safeNum(x.walkdowns),lowSeverity:safeNum(x.lowSeverity!==undefined?x.lowSeverity:Number(x.nearMiss||0)+Number(x.firstAid||0)+Number(x.mtc||0)),serious:safeNum(x.serious!==undefined?x.serious:x.lti),safetyIndex:index};
-}).filter(function(x){return x.month});
-}
+  function showView(view) {
+    document.getElementById('projectView').classList.add('hidden');
+    document.getElementById('yearView').classList.add('hidden');
+    document.getElementById('periodView').classList.add('hidden');
+    document.getElementById('compareView').classList.add('hidden');
+    document.getElementById('loadingView').classList.add('hidden');
+    document.getElementById('dashboardView').classList.add('hidden');
+    document.getElementById('errorView').classList.add('hidden');
 
-function safeNum(v){
-if(v===null||v===undefined||v==='')return null;
-const n=Number(v);return isFinite(n)?n:null;
-}
+    if (view === 'project') document.getElementById('projectView').classList.remove('hidden');
+    if (view === 'year') document.getElementById('yearView').classList.remove('hidden');
+    if (view === 'period') document.getElementById('periodView').classList.remove('hidden');
+    if (view === 'compare') document.getElementById('compareView').classList.remove('hidden');
+    if (view === 'loading') document.getElementById('loadingView').classList.remove('hidden');
+    if (view === 'dashboard') document.getElementById('dashboardView').classList.remove('hidden');
 
-function ncrTrendValue(x){
-if(x.ncrClosure!==undefined)return clamp(Number(x.ncrClosure)||0,0,100);
-const closed=Number(x.ncrClosed||0);const total=Number(x.ncrTotal||0);
-return total>0?closed/total*100:null;
-}
+    if (view === 'project') {
+      currentSelection = { project: '', year: '', month: 'All Months' };
+      destroyCharts();
+      resetCompareView();
+    }
+  }
 
-function ncrPercent(p){
-const total=getNcrTotal(p);return total>0?getNcrClosed(p)/total*100:null;
-}
+  function buildSelectionButtons() {
+    const projectContainer = document.getElementById('projectButtons');
+    projectContainer.innerHTML = '';
+    PROJECTS.forEach(project => {
+      const button = document.createElement('button');
+      button.className = 'selectionButton';
+      button.textContent = project;
+      button.onclick = () => selectProject(project);
+      projectContainer.appendChild(button);
+    });
 
-function getSafetyIndex(p){
-if(p.safetyIndex!==undefined&&p.safetyIndex!==null&&isFinite(Number(p.safetyIndex)))return clamp(Number(p.safetyIndex),0,100);
-const values=[safeNum(p.toolbox),safeNum(p.training),ncrPercent(p),safeNum(p.actions),safeNum(p.walkdowns)].filter(function(v){return v!==null});
-return values.length?clamp(values.reduce(function(a,b){return a+b},0)/values.length,0,100):null;
-}
+    const allButton = document.createElement('button');
+    allButton.className = 'selectionButton all';
+    allButton.textContent = 'All Projects';
+    allButton.onclick = () => selectProject('All Projects');
+    projectContainer.appendChild(allButton);
 
-function getSafetyDirection(p){
-const trend=getSafetyTrendData(p).filter(function(x){return x.safetyIndex!==null});
-if(trend.length<2)return'flat';
-const last=trend[trend.length-1].safetyIndex;const prev=trend[trend.length-2].safetyIndex;
-if(last>prev+0.5)return'up';if(last<prev-0.5)return'down';return'flat';
-}
+    const yearContainer = document.getElementById('yearButtons');
+    yearContainer.innerHTML = '';
+    YEARS.forEach(year => {
+      const button = document.createElement('button');
+      button.className = 'selectionButton';
+      button.textContent = year;
+      button.onclick = () => selectYear(year);
+      yearContainer.appendChild(button);
+    });
 
-function snapshot(label,value,isPercent){
-return '<div class="snap"><small>'+escapeHtml(label)+'</small><strong>'+(value===null||value===undefined||value===''?'N/A':(isPercent===false?formatNumber(value):formatPercent(value)))+'</strong></div>';
-}
+    const allYears = document.createElement('button');
+    allYears.className = 'selectionButton all';
+    allYears.textContent = 'All Years';
+    allYears.onclick = () => selectYear('All Years');
+    yearContainer.appendChild(allYears);
 
-function destroyCharts(){
-Object.keys(charts).forEach(function(key){
-if(charts[key]){
-charts[key].destroy();
-delete charts[key];
-}
-});
-}
-function getProjectStatus(progress,seriousRate){
-if(Number(seriousRate)>0)return'ATTENTION';
-if(Number(progress)>=75)return'ON TRACK';
-if(Number(progress)>=40)return'IN PROGRESS';
-return'START-UP';
-}
-function rateScale(value){
-const v=Number(value||0);
-if(v<=0)return 1;
-return Math.max(1,v*2);
-}
-function toggleExpand(element){
-element.classList.toggle('open');
-}
-function formatNumber(value){
-const num=Number(value||0);
-if(!isFinite(num))return'0';
-return num.toLocaleString('en-US',{maximumFractionDigits:2});
-}
-function formatPercent(value){
-const num=Number(value||0);
-if(!isFinite(num))return'0%';
-return num.toLocaleString('en-US',{maximumFractionDigits:2})+'%';
-}
-function formatDisplay(value){
-if(typeof value==='string'&&value.includes('%'))return value;
-if(typeof value==='string'&&value.includes('/'))return value;
-return formatNumber(value);
-}
-function clamp(value,min,max){
-return Math.min(Math.max(Number(value)||0,min),max);
-}
-function escapeHtml(value){
-return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-}
-function runComparison(){
-if(compareSelection.projects.length<2||!compareSelection.year)return;
-const error=document.getElementById('compareError');
-error.classList.add('hidden');
-document.getElementById('runCompareButton').disabled=true;
-document.getElementById('runCompareButton').textContent='Loading comparison...';
-const requests=compareSelection.projects.map(function(project){return callAPI('getDashboardData',{project:project,year:compareSelection.year,month:compareSelection.month},2,15000).then(function(data){if(!data||data.success===false)throw new Error(data&&data.error?data.error:'No data returned for '+project);const row=(Array.isArray(data.projectData)?data.projectData:[]).find(function(x){return x.project===project})||(Array.isArray(data.projectData)?data.projectData[0]:null);if(!row)throw new Error('No project data returned for '+project);return row;})});
-Promise.all(requests).then(function(rows){renderComparison(rows)}).catch(function(err){error.textContent=err.message||'Unable to load comparison data.';error.classList.remove('hidden')}).finally(function(){document.getElementById('runCompareButton').disabled=false;document.getElementById('runCompareButton').textContent='Compare Selected Projects';updateCompareRunState()});
-}
+    const periodContainer = document.getElementById('periodButtons');
+    periodContainer.innerHTML = '';
+    MONTHS.forEach(month => {
+      const button = document.createElement('button');
+      button.className = 'periodButton' + (month.value === 'All Months' ? ' all' : '') + (currentSelection.month === month.value ? ' selected' : '');
+      button.textContent = month.label;
+      button.onclick = () => selectPeriod(month.value);
+      periodContainer.appendChild(button);
+    });
+  }
 
-function renderComparison(rows){
-const body=document.getElementById('compareTableBody');
-body.innerHTML=rows.map(function(p){
-const low=Number(p.nearMiss||0)+Number(p.firstAid||0)+Number(p.mtc||0);
-const ncr=ncrPercent(p);const score=getSafetyIndex(p);
-return '<tr><td><b>'+escapeHtml(p.project||'Project')+'</b></td><td>'+formatPercent(p.progress)+'</td><td>'+formatPercent(p.toolbox)+'</td><td>'+formatPercent(p.training)+'</td><td>'+(ncr===null?'N/A':formatPercent(ncr))+'</td><td>'+formatPercent(p.actions)+'</td><td>'+formatPercent(p.walkdowns)+'</td><td>'+formatNumber(low)+'</td><td>'+formatNumber(p.lti)+'</td><td>'+formatNumber(p.manhours)+'</td><td>'+formatNumber(p.safety)+'</td><td class="scoreCell">'+(score===null?'N/A':formatPercent(score))+'</td></tr>';
-}).join('');
-document.getElementById('compareResultMeta').textContent=compareSelection.year+' • '+(compareSelection.month==='All Months'?'All Year':compareSelection.month);
-document.getElementById('compareResults').classList.remove('hidden');
-renderComparisonChart(rows);
-}
+  function buildCompareSelectionButtons() {
+    const pc = document.getElementById('compareProjectButtons');
+    const yc = document.getElementById('compareYearButtons');
+    const mc = document.getElementById('comparePeriodButtons');
+    pc.innerHTML = yc.innerHTML = mc.innerHTML = '';
 
-function renderComparisonChart(rows){
-if(compareChart)compareChart.destroy();
-const labels=rows.map(function(p){return p.project||'Project'});
-const metrics=function(p){return [Number(p.toolbox||0),Number(p.training||0),Number(ncrPercent(p)||0),Number(p.actions||0),Number(p.walkdowns||0),Number(getSafetyIndex(p)||0)]};
-const values=rows.map(metrics);
-const datasets=[
-{label:'Toolbox %',data:values.map(function(v){return v[0]}),borderWidth:1,borderRadius:4},
-{label:'Training %',data:values.map(function(v){return v[1]}),borderWidth:1,borderRadius:4},
-{label:'NCR Closure %',data:values.map(function(v){return v[2]}),borderWidth:1,borderRadius:4},
-{label:'Actions %',data:values.map(function(v){return v[3]}),borderWidth:1,borderRadius:4},
-{label:'Walkdowns %',data:values.map(function(v){return v[4]}),borderWidth:1,borderRadius:4},
-{label:'Safety Index %',data:values.map(function(v){return v[5]}),borderWidth:1,borderRadius:4}
-];
-compareChart=new Chart(document.getElementById('compareChart'),{type:'bar',data:{labels:labels,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:8}}}},scales:{x:{ticks:{font:{size:8}},grid:{display:false}},y:{beginAtZero:true,max:100,title:{display:true,text:'Performance %',font:{size:9}}}}}});
-}
+    PROJECTS.forEach(project => {
+      const b = document.createElement('button');
+      b.className = 'selectionButton compareProjectButton' + (compareSelection.projects.includes(project) ? ' selected' : '');
+      b.textContent = project;
+      b.onclick = () => toggleCompareProject(project);
+      pc.appendChild(b);
+    });
 
-buildSelectionButtons();
-buildCompareSelectionButtons();
-showView('project');
+    const all = document.createElement('button');
+    all.className = 'selectionButton compareProjectButton all' + (compareSelection.projects.length === PROJECTS.length ? ' selected' : '');
+    all.textContent = 'All Projects';
+    all.onclick = () => {
+      compareSelection.projects = PROJECTS.slice();
+      buildCompareSelectionButtons();
+      updateCompareRunState();
+    };
+    pc.appendChild(all);
+
+    YEARS.forEach(year => {
+      const b = document.createElement('button');
+      b.className = 'periodButton' + (compareSelection.year === year ? ' selected' : '');
+      b.textContent = year;
+      b.onclick = () => {
+        compareSelection.year = year;
+        buildCompareSelectionButtons();
+        updateCompareRunState();
+      };
+      yc.appendChild(b);
+    });
+
+    const ay = document.createElement('button');
+    ay.className = 'periodButton all' + (compareSelection.year === 'All Years' ? ' selected' : '');
+    ay.textContent = 'All Years';
+    ay.onclick = () => {
+      compareSelection.year = 'All Years';
+      buildCompareSelectionButtons();
+      updateCompareRunState();
+    };
+    yc.appendChild(ay);
+
+    MONTHS.forEach(month => {
+      const b = document.createElement('button');
+      b.className = 'periodButton' + (month.value === 'All Months' ? ' all' : '') + (compareSelection.month === month.value ? ' selected' : '');
+      b.textContent = month.label;
+      b.onclick = () => {
+        compareSelection.month = month.value;
+        buildCompareSelectionButtons();
+        updateCompareRunState();
+      };
+      mc.appendChild(b);
+    });
+    updateCompareRunState();
+  }
+
+  function toggleCompareProject(project) {
+    const index = compareSelection.projects.indexOf(project);
+    if (index >= 0) compareSelection.projects.splice(index, 1);
+    else compareSelection.projects.push(project);
+    buildCompareSelectionButtons();
+    updateCompareRunState();
+  }
+
+  function openCompareView() {
+    compareSelection = { projects: PROJECTS.slice(), year: currentSelection.year || 'All Years', month: currentSelection.month || 'All Months' };
+    document.getElementById('compareResults').classList.add('hidden');
+    document.getElementById('compareError').classList.add('hidden');
+    showView('compare');
+    buildCompareSelectionButtons();
+  }
+
+  function resetCompareView() {
+    if (compareChart) { compareChart.destroy(); compareChart = null; }
+    const results = document.getElementById('compareResults');
+    if (results) results.classList.add('hidden');
+    const err = document.getElementById('compareError');
+    if (err) { err.classList.add('hidden'); err.textContent = ''; }
+  }
+
+  function updateCompareRunState() {
+    const btn = document.getElementById('runCompareButton');
+    if (!btn) return;
+    btn.disabled = compareSelection.projects.length < 2 || !compareSelection.year || !compareSelection.month;
+  }
+
+  function selectProject(project) {
+    currentSelection.project = project;
+    currentSelection.year = '';
+    currentSelection.month = 'All Months';
+    document.getElementById('yearTitle').textContent = 'Select Year';
+    document.getElementById('yearPath').textContent = project;
+    showView('year');
+  }
+
+  function selectYear(year) {
+    currentSelection.year = year;
+    currentSelection.month = 'All Months';
+    document.getElementById('periodTitle').textContent = 'Select Period';
+    document.getElementById('periodPath').textContent = currentSelection.project + ' • ' + year;
+    showView('period');
+  }
+
+  function selectPeriod(month) {
+    currentSelection.month = month;
+    loadDashboard();
+  }
+
+  function openSingleProject(project) {
+    currentSelection.project = project;
+    loadDashboard();
+  }
+
+  function openSingleProjectFromElement(element) {
+    openSingleProject(element && element.dataset ? element.dataset.project : '');
+  }
+
+  function loadDashboard() {
+    const token = ++requestToken;
+    showView('loading');
+    document.getElementById('loadingText').textContent = 'Loading ' + (currentSelection.project === 'All Projects' ? 'all projects' : currentSelection.project) + ' • ' + currentSelection.year + ' • ' + (currentSelection.month === 'All Months' ? 'All Year' : currentSelection.month);
+
+    callAPI('getDashboardData', { project: currentSelection.project, year: currentSelection.year, month: currentSelection.month }, 2, 15000)
+      .then(data => {
+        if (token !== requestToken) return;
+        if (!data || data.success === false) throw new Error(data && data.error ? data.error : 'No dashboard data returned.');
+        updateDashboard(data);
+        document.getElementById('selectionInfo').textContent = currentSelection.project + ' • ' + currentSelection.year + ' • ' + (currentSelection.month === 'All Months' ? 'All Year' : currentSelection.month);
+        showView('dashboard');
+      })
+      .catch(error => {
+        if (token !== requestToken) return;
+        showError(error.message || 'Unable to load dashboard data.');
+      });
+  }
+
+  function showError(message) {
+    document.getElementById('errorBox').innerHTML = escapeHtml(message) + '<br><button class="changeButton" style="margin-top:12px" onclick="showView(\'period\')">Back to Selection</button>';
+    document.getElementById('errorView').classList.remove('hidden');
+    document.getElementById('loadingView').classList.add('hidden');
+  }
+
+  function callAPI(action, params = {}, retries = 2, timeout = 15000) {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      function request() {
+        attempts++;
+        const callbackName = '__hse_callback_' + Date.now() + '_' + (++jsonpCounter);
+        const script = document.createElement('script');
+        const queryParams = new URLSearchParams();
+        queryParams.set('action', action);
+        queryParams.set('callback', callbackName);
+        Object.keys(params).forEach(key => queryParams.set(key, params[key]));
+        script.src = API_URL + '?' + queryParams.toString();
+        let completed = false;
+        
+        const timer = setTimeout(() => {
+          if (completed) return;
+          completed = true;
+          cleanup();
+          if (attempts <= retries) setTimeout(request, 500 * attempts);
+          else reject(new Error('Dashboard API timeout. Please try again.'));
+        }, timeout);
+
+        function cleanup() {
+          clearTimeout(timer);
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+
+        window[callbackName] = data => {
+          if (completed) return;
+          completed = true;
+          cleanup();
+          if (data && data.success === false) {
+            if (attempts <= retries) setTimeout(request, 500 * attempts);
+            else reject(new Error(data.error || 'API Error'));
+            return;
+          }
+          resolve(data);
+        };
+
+        script.onerror = () => {
+          if (completed) return;
+          completed = true;
+          cleanup();
+          if (attempts <= retries) setTimeout(request, 500 * attempts);
+          else reject(new Error('Unable to connect to HSE Dashboard API.'));
+        };
+        document.body.appendChild(script);
+      }
+      request();
+    });
+  }
+
+  function updateDashboard(data) {
+    const projects = Array.isArray(data.projectData) ? data.projectData : [];
+    updatePortfolio(data, projects);
+    renderProjects(projects);
+  }
+
+  function updatePortfolio(data, projects) {
+    document.getElementById('activeProjects').textContent = formatNumber(projects.length);
+    const singleProject = currentSelection.project && currentSelection.project !== 'All Projects';
+    document.getElementById('progressSummary').classList.toggle('hidden', !singleProject);
+    document.getElementById('overallProgress').textContent = singleProject ? formatPercent(projects[0] && projects[0].progress) : '—';
+    document.getElementById('portfolioNcr').textContent = formatNcrPortfolio(projects);
+    const openNames = projects.filter(p => getNcrOpen(p) > 0).map(p => p.project || 'Project');
+    document.getElementById('portfolioNcrOpen').textContent = openNames.length ? 'Open NCR: ' + openNames.join(' • ') : 'No open NCRs';
+    document.getElementById('lowSeverityRate').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.nearMiss || 0) + Number(p.firstAid || 0) + Number(p.mtc || 0), 0));
+    document.getElementById('portfolioManhours').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.manhours || 0), 0));
+    document.getElementById('portfolioSafetyManpower').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.safety || 0), 0));
+  }
+
+  function formatNcrPortfolio(projects) {
+    const closed = projects.reduce((sum, p) => sum + getNcrClosed(p), 0);
+    const total = projects.reduce((sum, p) => sum + getNcrTotal(p), 0);
+    return formatNumber(closed) + ' / ' + formatNumber(total);
+  }
+
+  function formatNcr(data) {
+    const closed = Number(data.ncrClosed !== undefined ? data.ncrClosed : (data.ncr !== undefined ? data.ncr : 0)) || 0;
+    const open = Number(data.ncrOpen !== undefined ? data.ncrOpen : 0) || 0;
+    const total = closed + open;
+    if (data.ncrOpen !== undefined) return formatNumber(closed) + ' / ' + formatNumber(total);
+    return formatNumber(closed) + ' / 0';
+  }
+
+  function renderProjects(projects) {
+    const container = document.getElementById('projects');
+    destroyCharts();
+    const single = currentSelection.project && currentSelection.project !== 'All Projects' && projects.length === 1;
+    container.classList.toggle('singleMode', single);
+    
+    if (!projects || projects.length === 0) {
+      container.innerHTML = '<div class="empty">No project data available for the selected filters.</div>';
+      return;
+    }
+    
+    container.innerHTML = projects.map((project, index) => createProjectCard(project, index, single)).join('');
+    projects.forEach((project, index) => createSafetyTrend(project, index, single));
+  }
+
+  function createSingleKpi(label, value, meta = '', className = '') {
+    return `<div class="singleKpi ${className}"><div class="kpiLabel">${escapeHtml(label)}</div><div class="kpiValue">${value}</div>${meta ? `<div class="kpiMeta">${escapeHtml(meta)}</div>` : ''}</div>`;
+  }
+
+  function createProjectCard(p, index, singleMode) {
+    const progress = clamp(Number(p.progress || 0), 0, 100);
+    const lowCount = Number(p.nearMiss || 0) + Number(p.firstAid || 0) + Number(p.mtc || 0);
+    const seriousCount = Number(p.lti || 0);
+    const seriousRate = Number(p.seriousIncidentRate || 0);
+    const projectId = 'project_' + index;
+    const safetyIndex = getSafetyIndex(p);
+    const arrow = getSafetyDirection(p);
+    const arrowClass = arrow === 'up' ? 'up' : arrow === 'down' ? 'down' : 'flat';
+    let performanceSection = '';
+
+    if (singleMode) {
+      performanceSection = `<div class="safety"><div class="shead"><b>HSE PERFORMANCE</b><span>Actual KPI Values</span></div><div class="singleKpis">` +
+        createSingleKpi('Toolbox Talks', formatNumber(p.toolbox), 'Actual count', 'positive') +
+        createSingleKpi('Training', formatNumber(p.training), 'People trained', 'positive') +
+        createSingleKpi('NCR Closure', formatNcrProject(p), (ncrPercent(p) === null ? 'No NCR' : formatPercent(ncrPercent(p)) + ' closed'), ncrPercent(p) === 100 || getNcrTotal(p) === 0 ? 'positive' : 'negative') +
+        createSingleKpi('Action Track', formatNumber(p.actions), 'Actual count', 'positive') +
+        createSingleKpi('Walkdowns', formatNumber(p.walkdowns), 'Actual count', 'positive') +
+        createSingleKpi('Near Miss', formatNumber(p.nearMiss), 'Positive indicator', 'positive') +
+        createSingleKpi('First Aid', formatNumber(p.firstAid), 'Incident count', p.firstAid > 0 ? 'negative' : '') +
+        createSingleKpi('Medical Treatment', formatNumber(p.mtc), 'Incident count', p.mtc > 0 ? 'negative' : '') +
+        createSingleKpi('LTI', formatNumber(p.lti), 'Serious incident', p.lti > 0 ? 'negative' : '') +
+        createSingleKpi('Property Damage', formatNumber(p.property), 'Incident count', p.property > 0 ? 'negative' : '') +
+        createSingleKpi('Environmental', formatNumber(p.environment), 'Incident count', p.environment > 0 ? 'negative' : '') +
+        createSingleKpi('Safe Man-Hours', formatNumber(p.manhours), 'Actual project man-hours') +
+        createSingleKpi('Safety Index', safetyIndex === null ? 'N/A' : formatPercent(safetyIndex), 'Calculated HSE performance', 'score') +
+        createSingleKpi('Incident Performance', formatPercent(getIncidentPerformance(p)), 'NM positive / negative events deduct', 'score') +
+        `</div></div>`;
+    } else {
+      performanceSection = `<div class="safety"><div class="shead"><b>SAFETY PERFORMANCE INDICATORS</b><span>Actual data</span></div><div class="bars">` +
+        indicatorBar('Toolbox', p.toolbox, 100, false) +
+        indicatorBar('Training', p.training, 100, false) +
+        indicatorBar('NCR Closure', getNcrClosed(p), getNcrTotal(p), false, true) +
+        indicatorBar('Actions', p.actions, 100, false, true) +
+        indicatorBar('Walkdowns', p.walkdowns, 100, false, true) +
+        indicatorBar('Low Severity', lowCount, rateScale(lowCount), true) +
+        indicatorBar('Serious', seriousCount, rateScale(seriousCount), true) +
+        `</div></div>`;
+    }
+
+    return `<div class="card project-card">
+      <div class="ctop">
+        <div class="pname projectLink" data-project="${escapeHtml(p.project || 'Project')}" onclick="openSingleProjectFromElement(this)" title="Open ${escapeHtml(p.project || 'Project')}">${escapeHtml(p.project || 'Project')}</div>
+        <div class="status">${getProjectStatus(progress, seriousRate)}</div>
+      </div>
+      <div class="info">
+        <div class="ring" style="--progress:${(progress * 3.6)}deg"><b>${formatPercent(progress)}</b></div>
+        <div>
+          <div class="label">PROJECT PROGRESS</div>
+          <div class="value">${formatPercent(progress)}</div>
+          <div class="note">Real project progress from HSE project data.</div>
+        </div>
+        <div class="man">
+          <div class="label">MANPOWER</div>
+          <div class="value">${formatNumber(p.manpower)}</div>
+          <div class="label" style="margin-top:5px">SAFETY</div>
+          <div class="value">${formatNumber(p.safety)}</div>
+        </div>
+      </div>
+      ${performanceSection}
+      <div class="detailRow">
+        <div class="expand" onclick="toggleExpand(this)">
+          <div class="expandHead"><b>INCIDENT SUMMARY</b><span><span class="arrow">▼</span></span></div>
+          <div class="expandBody">
+            <div class="grid8">
+              ${mini('Near Miss', p.nearMiss)}
+              ${mini('First Aid', p.firstAid)}
+              ${mini('Medical Treatment', p.mtc)}
+              ${mini('LTI', p.lti)}
+              ${mini('Property Damage', p.property)}
+              ${mini('Environmental', p.environment)}
+              ${mini('Total Low Severity', lowCount)}
+              ${mini('Total Serious', seriousCount)}
+            </div>
+          </div>
+        </div>
+        <div class="expand" onclick="toggleExpand(this)">
+          <div class="expandHead"><b>HSE PERFORMANCE</b><span><span class="arrow">▼</span></span></div>
+          <div class="expandBody">
+            <div class="summary"><strong>Safe Man-Hours:</strong> ${formatNumber(p.manhours)}</div>
+            <div class="grid8">
+              ${mini('NCR Closure', formatNcrProject(p))}
+              ${mini('Action Tracking', p.actions)}
+              ${mini('Walkdowns', p.walkdowns)}
+              ${mini('Toolbox Talks', p.toolbox)}
+              ${mini('Training', p.training)}
+              ${mini('Safety Index', safetyIndex === null ? 'N/A' : formatPercent(safetyIndex))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="trend">
+        <div class="trendhead">
+          <span>HSE PERFORMANCE TREND</span>
+          <div class="trendheadRight">
+            <span class="trendScoreBox">Safety Index <b>${safetyIndex === null ? 'N/A' : formatPercent(safetyIndex)}</b><span class="trendArrow ${arrowClass}">${arrow === 'up' ? '↑' : arrow === 'down' ? '↓' : '→'}</span></span>
+            <span>Monthly KPI View</span>
+          </div>
+        </div>
+        <div class="trendSnapshot">
+          ${snapshot('Toolbox', p.toolbox, false)}
+          ${snapshot('Training', p.training, false)}
+          ${snapshot('NCR Closure', ncrPercent(p))}
+          ${snapshot('Actions', p.actions, false)}
+          ${snapshot('Walkdowns', p.walkdowns, false)}
+          ${snapshot('Incident Perf.', getIncidentPerformance(p), true)}
+        </div>
+        <div class="chart"><canvas id="${projectId}"></canvas></div>
+        <div id="trendNotice_${index}" class="trendNotice hidden"></div>
+      </div>
+    </div>`;
+  }
+
+  function getNcrClosed(p) { return p.ncrClosed !== undefined ? Number(p.ncrClosed) || 0 : Number(p.ncr || 0) || 0; }
+  function getNcrOpen(p) { return p.ncrOpen !== undefined ? Number(p.ncrOpen) || 0 : 0; }
+  function getNcrTotal(p) { return getNcrClosed(p) + getNcrOpen(p); }
+  function formatNcrProject(p) { return formatNumber(getNcrClosed(p)) + ' / ' + formatNumber(getNcrTotal(p)); }
+
+  function indicatorBar(name, value, scale, isIncident, forceNumber) {
+    const numeric = Number(value || 0);
+    const safeScale = Number(scale || 0);
+    const height = safeScale > 0 ? clamp(numeric / safeScale * 100, 2, 100) : 2;
+    let displayValue;
+    if (name === 'NCR Closure') displayValue = formatNumber(numeric) + ' / ' + formatNumber(safeScale);
+    else if (isIncident || forceNumber) displayValue = formatNumber(numeric);
+    else displayValue = formatPercent(numeric);
+
+    return `<div class="kpi">
+      <div class="pct">${displayValue}</div>
+      <div class="bararea"><div class="${isIncident ? 'bar incidentbar' : 'bar'}" style="--h:${height}"></div></div>
+      <div class="kname">${escapeHtml(name)}</div>
+      <div class="count">${isIncident ? 'Count' : name === 'NCR Closure' ? 'Closed / Total' : formatNumber(numeric)}</div>
+    </div>`;
+  }
+
+  function mini(label, value) {
+    return `<div class="mini"><small>${escapeHtml(label)}</small><strong>${formatDisplay(value)}</strong></div>`;
+  }
+
+  function createSafetyTrend(p, index, large) {
+    const canvasId = 'project_' + index;
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const trend = getSafetyTrendData(p);
+    const notice = document.getElementById('trendNotice_' + index);
+
+    if (!trend.length) {
+      if (notice) {
+        notice.textContent = 'Monthly safety KPI history is not available from the current API response. The dashboard will not invent trend values.';
+        notice.classList.remove('hidden');
+      }
+      return;
+    }
+
+    const labels = trend.map(x => x.month);
+    const toolbox = trend.map(x => safeNum(x.toolbox));
+    const training = trend.map(x => safeNum(x.training));
+    const ncr = trend.map(x => safeNum(x.ncrClosure));
+    const actions = trend.map(x => safeNum(x.actions));
+    const walkdowns = trend.map(x => safeNum(x.walkdowns));
+    const low = trend.map(x => safeNum(x.lowSeverity));
+    const serious = trend.map(x => safeNum(x.serious));
+    const incidentPerformance = trend.map(x => x.incidentPerformance == null ? null : safeNum(x.incidentPerformance));
+    const score = trend.map(x => x.safetyIndex == null ? null : safeNum(x.safetyIndex));
+
+    let datasets = large ? [
+      { type: 'bar', label: 'Toolbox Talks', data: toolbox, yAxisID: 'counts', borderRadius: 4 },
+      { type: 'bar', label: 'Training', data: training, yAxisID: 'counts', borderRadius: 4 },
+      { type: 'bar', label: 'Actions', data: actions, yAxisID: 'counts', borderRadius: 4 },
+      { type: 'bar', label: 'Walkdowns', data: walkdowns, yAxisID: 'counts', borderRadius: 4 },
+      { type: 'line', label: 'NCR Closure %', data: ncr, yAxisID: 'performance', borderWidth: 2, tension: 0.35, pointRadius: 3 },
+      { type: 'line', label: 'Incident Performance %', data: incidentPerformance, yAxisID: 'performance', borderWidth: 2, tension: 0.35, pointRadius: 3 },
+      { type: 'line', label: 'Safety Index %', data: score, yAxisID: 'performance', borderWidth: 3, tension: 0.35, pointRadius: 4 },
+      { type: 'bar', label: 'Low Severity', data: low, yAxisID: 'counts', borderRadius: 3 },
+      { type: 'bar', label: 'Serious', data: serious, yAxisID: 'counts', borderRadius: 3 }
+    ] : [
+      { type: 'line', label: 'Toolbox %', data: toolbox, borderWidth: 2, tension: 0.35, pointRadius: 2 },
+      { type: 'line', label: 'Training %', data: training, borderWidth: 2, tension: 0.35, pointRadius: 2 },
+      { type: 'line', label: 'NCR Closure %', data: ncr, borderWidth: 2, tension: 0.35, pointRadius: 2 },
+      { type: 'line', label: 'Actions %', data: actions, borderWidth: 2, tension: 0.35, pointRadius: 2 },
+      { type: 'line', label: 'Walkdowns %', data: walkdowns, borderWidth: 2, tension: 0.35, pointRadius: 2 },
+      { type: 'line', label: 'Safety Index %', data: score, borderWidth: 3, tension: 0.35, pointRadius: 2 },
+      { type: 'bar', label: 'Low Severity', data: low, yAxisID: 'incidents', borderRadius: 3 },
+      { type: 'bar', label: 'Serious', data: serious, yAxisID: 'incidents', borderRadius: 3 }
+    ];
+
+    charts[canvasId] = new Chart(canvas, {
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: large, position: 'bottom', labels: { boxWidth: 10, font: { size: large ? 9 : 7 } } },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const label = ctx.dataset.label || '';
+                return label + ': ' + (ctx.dataset.yAxisID === 'performance' ? formatPercent(ctx.parsed.y) : formatNumber(ctx.parsed.y));
+              }
+            }
+          }
+        },
+        scales: {
+          x: { ticks: { font: { size: large ? 8 : 7 }, maxRotation: 0 }, grid: { display: false } },
+          counts: { display: large, beginAtZero: true, position: 'left', title: { display: large, text: 'Actual Count', font: { size: 9 } } },
+          performance: { display: large, beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false }, title: { display: large, text: 'Performance %', font: { size: 9 } } },
+          incidents: { display: !large, position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: large, text: 'Incident Count', font: { size: 9 } } }
+        },
+        elements: { line: { fill: false } }
+      }
+    });
+  }
+
+  function getSafetyTrendData(p) {
+    let source = Array.isArray(p.safetyTrend) ? p.safetyTrend : [];
+    if (!source.length && Array.isArray(p.trend)) {
+      const looksLikeSafety = p.trend.some(x => x && ['toolbox', 'training', 'actions', 'walkdowns', 'ncrClosure', 'ncrClosed', 'ncrTotal', 'lowSeverity', 'serious', 'safetyIndex', 'nearMiss', 'firstAid', 'mtc', 'lti', 'property', 'environment'].some(k => x[k] !== undefined));
+      if (looksLikeSafety) source = p.trend;
+    }
+    return source.map(x => {
+      const ncr = ncrTrendValue(x);
+      const lowSeverity = x.lowSeverity !== undefined ? x.lowSeverity : (Number(x.nearMiss || 0) + Number(x.firstAid || 0) + Number(x.mtc || 0));
+      const incidentPerformance = getIncidentPerformance(x);
+      const metrics = [getTbtScore(x.toolbox), ncr, getActionScore(x.actions), getWalkdownScore(x.walkdowns), incidentPerformance].filter(v => v !== null);
+      const index = metrics.length ? metrics.reduce((a, b) => a + b, 0) / metrics.length : null;
+
+      return {
+        month: x.month || x.label || '', toolbox: safeNum(x.toolbox), training: safeNum(x.training), ncrClosure: ncr, actions: safeNum(x.actions), walkdowns: safeNum(x.walkdowns),
+        lowSeverity: safeNum(lowSeverity), serious: safeNum(x.serious !== undefined ? x.serious : x.lti), incidentPerformance: incidentPerformance, safetyIndex: index
+      };
+    }).filter(x => x.month);
+  }
+
+  function safeNum(v) { return (v === null || v === undefined || v === '') ? null : (isFinite(Number(v)) ? Number(v) : null); }
+  function ncrTrendValue(x) {
+    if (x.ncrClosure !== undefined) return clamp(Number(x.ncrClosure) || 0, 0, 100);
+    const closed = Number(x.ncrClosed || 0), total = Number(x.ncrTotal || 0);
+    return total > 0 ? closed / total * 100 : 100;
+  }
+  function ncrPercent(p) { const total = getNcrTotal(p); return total === 0 ? 100 : (getNcrClosed(p) / total * 100); }
+
+  function getTbtScore(count) {
+    let remaining = Math.max(0, Number(count || 0)), score = 0;
+    const first = Math.min(remaining, TBT_FIRST_BLOCK_COUNT);
+    score += first * TBT_FIRST_BLOCK_SCORE; remaining -= first;
+    if (remaining > 0) { const second = Math.min(remaining, TBT_SECOND_BLOCK_COUNT); score += second * TBT_SECOND_BLOCK_SCORE; remaining -= second; }
+    if (remaining > 0) { const third = Math.min(remaining, TBT_THIRD_BLOCK_COUNT); score += third * TBT_THIRD_BLOCK_SCORE; remaining -= third; }
+    return clamp(score, 0, 100);
+  }
+  function getWalkdownScore(count) {
+    const v = Math.max(0, Number(count || 0)); if (v <= 0) return 0;
+    const first = Math.min(v, WALKDOWN_FIRST_COUNT);
+    let score = first * WALKDOWN_FIRST_SCORE; const remaining = v - first;
+    if (remaining > 0) score += remaining * WALKDOWN_AFTER_SCORE;
+    return clamp(score, 0, 100);
+  }
+  function getActionScore(count) {
+    const v = Math.max(0, Number(count || 0)); if (v <= 0) return 0;
+    const first = Math.min(v, ACTION_FIRST_COUNT);
+    let score = first * ACTION_FIRST_SCORE; const remaining = v - first;
+    if (remaining > 0) score += remaining * ACTION_AFTER_SCORE;
+    return clamp(score, 0, 100);
+  }
+  function getTrainingScore(p) {
+    if (p.trainingScore !== undefined && p.trainingScore !== null && p.trainingScore !== '') return clamp(Number(p.trainingScore), 0, 100);
+    if (p.trainingPercent !== undefined && p.trainingPercent !== null && p.trainingPercent !== '') return clamp(Number(p.trainingPercent), 0, 100);
+    return null;
+  }
+  function getIncidentPerformance(p) {
+    const negativeEvents = Number(p.lti || 0) + Number(p.mtc || 0) + Number(p.firstAid || 0) + Number(p.property || 0) + Number(p.environment || 0);
+    return negativeEvents <= 0 ? 100 : clamp(100 - (negativeEvents * INCIDENT_DEDUCTION_PER_EVENT), 0, 100);
+  }
+  function getSafetyIndex(p) {
+    const values = [getTbtScore(p.toolbox), ncrPercent(p), getActionScore(p.actions), getWalkdownScore(p.walkdowns), getIncidentPerformance(p)];
+    const trainingScore = getTrainingScore(p); if (trainingScore !== null) values.push(trainingScore);
+    return values.length ? clamp(values.reduce((a, b) => a + b, 0) / values.length, 0, 100) : null;
+  }
+  function getSafetyDirection(p) {
+    const trend = getSafetyTrendData(p).filter(x => x.safetyIndex !== null);
+    if (trend.length < 2) return 'flat';
+    const last = trend[trend.length - 1].safetyIndex, prev = trend[trend.length - 2].safetyIndex;
+    return last > prev + 0.5 ? 'up' : last < prev - 0.5 ? 'down' : 'flat';
+  }
+  
+  function snapshot(label, value, isPercent = true) {
+    return `<div class="snap"><small>${escapeHtml(label)}</small><strong>${(value === null || value === undefined || value === '') ? 'N/A' : (isPercent === false ? formatNumber(value) : formatPercent(value))}</strong></div>`;
+  }
+  
+  function destroyCharts() { Object.keys(charts).forEach(key => { if (charts[key]) { charts[key].destroy(); delete charts[key]; } }); }
+  function getProjectStatus(progress, seriousRate) { return Number(seriousRate) > 0 ? 'ATTENTION' : Number(progress) >= 75 ? 'ON TRACK' : Number(progress) >= 40 ? 'IN PROGRESS' : 'START-UP'; }
+  function rateScale(value) { const v = Number(value || 0); return v <= 0 ? 1 : Math.max(1, v * 2); }
+  function toggleExpand(element) { element.classList.toggle('open'); }
+  function formatNumber(value) { const num = Number(value || 0); return !isFinite(num) ? '0' : num.toLocaleString('en-US', { maximumFractionDigits: 2 }); }
+  function formatPercent(value) { const num = Number(value || 0); return !isFinite(num) ? '0%' : num.toLocaleString('en-US', { maximumFractionDigits: 2 }) + '%'; }
+  function formatDisplay(value) { return (typeof value === 'string' && (value.includes('%') || value.includes('/'))) ? value : formatNumber(value); }
+  function clamp(value, min, max) { return Math.min(Math.max(Number(value) || 0, min), max); }
+  function escapeHtml(value) { return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
+
+  function runComparison() {
+    if (compareSelection.projects.length < 2 || !compareSelection.year || !compareSelection.month) return;
+    const error = document.getElementById('compareError');
+    error.classList.add('hidden');
+    const btn = document.getElementById('runCompareButton');
+    btn.disabled = true; btn.textContent = 'Loading comparison...';
+
+    const requests = compareSelection.projects.map(project => {
+      return callAPI('getDashboardData', { project: project, year: compareSelection.year, month: compareSelection.month }, 2, 15000)
+        .then(data => {
+          if (!data || data.success === false) throw new Error(data && data.error ? data.error : 'No data returned for ' + project);
+          const row = (Array.isArray(data.projectData) ? data.projectData : []).find(x => x.project === project) || (Array.isArray(data.projectData) ? data.projectData[0] : null);
+          if (!row) throw new Error('No project data returned for ' + project);
+          return row;
+        });
+    });
+
+    Promise.all(requests)
+      .then(rows => renderComparison(rows))
+      .catch(err => { error.textContent = err.message || 'Unable to load comparison data.'; error.classList.remove('hidden'); })
+      .finally(() => { btn.disabled = false; btn.textContent = 'Compare Selected Projects'; updateCompareRunState(); });
+  }
+
+  function renderComparison(rows) {
+    document.getElementById('compareTableBody').innerHTML = rows.map(p => {
+      const low = Number(p.nearMiss || 0) + Number(p.firstAid || 0) + Number(p.mtc || 0);
+      const ncr = ncrPercent(p);
+      const score = getSafetyIndex(p);
+      return `<tr>
+        <td><b>${escapeHtml(p.project || 'Project')}</b></td>
+        <td>${formatPercent(p.progress)}</td>
+        <td>${formatPercent(p.toolbox)}</td>
+        <td>${formatPercent(p.training)}</td>
+        <td>${formatPercent(ncr)}</td>
+        <td>${formatPercent(p.actions)}</td>
+        <td>${formatPercent(p.walkdowns)}</td>
+        <td>${formatNumber(low)}</td>
+        <td>${formatNumber(p.lti)}</td>
+        <td>${formatNumber(p.manhours)}</td>
+        <td>${formatNumber(p.safety)}</td>
+        <td class="scoreCell">${score === null ? 'N/A' : formatPercent(score)}</td>
+      </tr>`;
+    }).join('');
+    
+    document.getElementById('compareResultMeta').textContent = compareSelection.year + ' • ' + (compareSelection.month === 'All Months' ? 'All Year' : compareSelection.month);
+    document.getElementById('compareResults').classList.remove('hidden');
+    renderComparisonChart(rows);
+  }
+
+  function renderComparisonChart(rows) {
+    if (compareChart) { compareChart.destroy(); compareChart = null; }
+    const labels = rows.map(p => p.project || 'Project');
+    const values = rows.map(p => [Number(p.toolbox || 0), Number(p.training || 0), Number(ncrPercent(p) || 0), Number(p.actions || 0), Number(p.walkdowns || 0), Number(getSafetyIndex(p) || 0)]);
+
+    const datasets = [
+      { label: 'Toolbox %', data: values.map(v => v[0]), borderWidth: 1, borderRadius: 4 },
+      { label: 'Training %', data: values.map(v => v[1]), borderWidth: 1, borderRadius: 4 },
+      { label: 'NCR Closure %', data: values.map(v => v[2]), borderWidth: 1, borderRadius: 4 },
+      { label: 'Actions %', data: values.map(v => v[3]), borderWidth: 1, borderRadius: 4 },
+      { label: 'Walkdowns %', data: values.map(v => v[4]), borderWidth: 1, borderRadius: 4 },
+      { label: 'Safety Index %', data: values.map(v => v[5]), borderWidth: 1, borderRadius: 4 }
+    ];
+
+    // تم إصلاح الخطأ البرمجي في القوس الزائد هنا
+    compareChart = new Chart(document.getElementById('compareChart'), {
+      type: 'bar',
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 8 } } } },
+        scales: {
+          x: { ticks: { font: { size: 8 } }, grid: { display: false } },
+          y: { beginAtZero: true, max: 100, title: { display: true, text: 'Performance %', font: { size: 9 } } }
+        }
+      }
+    }); 
+  }
+
+  buildSelectionButtons();
+  buildCompareSelectionButtons();
+  showView('project');
+
 </script>
+
 </body>
 </html>
