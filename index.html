@@ -80,7 +80,7 @@
     .shead b { font-size: 10px; }
     .shead span { font-size: 8px; color: #b9d8d8; }
 
-    .bars { height: 174px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; align-items: stretch; border-bottom: 1px solid #ffffff33; }
+    .bars { height: 174px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; align-items: stretch; border-bottom: 1px solid #ffffff33; }
     .kpi { height: 100%; display: grid; grid-template-rows: 20px 108px auto auto; align-items: end; text-align: center; min-width: 0; }
     .pct { font-size: 9px; font-weight: 850; align-self: end; margin-bottom: 3px; }
     .bararea { height: 108px; width: 100%; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
@@ -165,11 +165,10 @@
     .trendArrow.flat { color: #7a8790; }
 
     .trendNotice { margin-top: 8px; background: #fff; border: 1px dashed #c9d7dc; border-radius: 8px; padding: 8px; font-size: 8px; color: #64737c; }
-    .trendSnapshot { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 8px; }
+    .trendSnapshot { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
     .snap { background: #ffffffdd; border: 1px solid #d5e1e5; border-radius: 8px; padding: 6px; text-align: center; }
     .snap small { display: block; color: #71808a; font-size: 7px; font-weight: 800; }
     .snap strong { display: block; font-size: 10px; margin-top: 2px; }
-    .singleMode .trendSnapshot { grid-template-columns: repeat(6, 1fr); }
 
     @media (max-width: 1200px) {
       .projects { grid-template-columns: repeat(2, 1fr); }
@@ -179,7 +178,6 @@
     }
 
     .compareProjectGrid { grid-template-columns: repeat(2, 1fr); }
-    .trendSnapshot, .singleMode .trendSnapshot { grid-template-columns: repeat(3, 1fr); }
     .compareChartWrap { height: 250px; }
     .singleMode .chart { height: 300px; }
 
@@ -194,9 +192,9 @@
       .periodGrid { grid-template-columns: repeat(2, 1fr); }
       .selectionTitle { font-size: 20px; }
       .dashboardTop { align-items: flex-start; gap: 10px; }
-      .selectionInfo { line-height: 1.5; }
       .info { grid-template-columns: 72px minmax(0, 1fr) 82px; gap: 10px; }
       .singleKpis { grid-template-columns: 1fr; }
+      .trendSnapshot { grid-template-columns: repeat(3, 1fr); }
     }
   </style>
 </head>
@@ -277,13 +275,12 @@
                 <th>Progress</th>
                 <th>Toolbox</th>
                 <th>Training</th>
-                <th>NCR Closure</th>
                 <th>Actions</th>
                 <th>Walkdowns</th>
+                <th>Near Miss</th>
                 <th>Low Severity</th>
                 <th>Serious / LTI</th>
-                <th>Safety Man-Hours</th>
-                <th>Safety Manpower</th>
+                <th>NCR (C/O)</th>
                 <th>Safety Index</th>
               </tr>
             </thead>
@@ -330,15 +327,15 @@
         <span>Current project progress</span>
       </div>
       <div class="sum">
-        <label>NCR CLOSURE</label>
+        <label>NCR STATUS</label>
         <strong id="portfolioNcr">0 / 0</strong>
-        <span class="good">Closed / Total</span>
+        <span class="good">Closed / Open</span>
         <span id="portfolioNcrOpen" class="warn" style="display:block;margin-top:5px;"></span>
       </div>
       <div class="sum">
         <label>TOTAL LOW SEVERITY INCIDENTS</label>
         <strong id="lowSeverityRate">0</strong>
-        <span>Total low severity</span>
+        <span>FA + MTC + Env</span>
       </div>
       <div class="sum">
         <label>SAFE MAN-HOURS</label>
@@ -370,41 +367,16 @@
     'Alstom',
     'Yada'
   ];
-
   const YEARS = ['2026', '2027', '2028'];
-
   const MONTHS = [
     { value: 'All Months', label: 'All Year' },
-    { value: 'January', label: 'January' },
-    { value: 'February', label: 'February' },
-    { value: 'March', label: 'March' },
-    { value: 'April', label: 'April' },
-    { value: 'May', label: 'May' },
-    { value: 'June', label: 'June' },
-    { value: 'July', label: 'July' },
-    { value: 'August', label: 'August' },
-    { value: 'September', label: 'September' },
-    { value: 'October', label: 'October' },
-    { value: 'November', label: 'November' },
-    { value: 'December', label: 'December' }
+    { value: 'January', label: 'January' }, { value: 'February', label: 'February' },
+    { value: 'March', label: 'March' }, { value: 'April', label: 'April' },
+    { value: 'May', label: 'May' }, { value: 'June', label: 'June' },
+    { value: 'July', label: 'July' }, { value: 'August', label: 'August' },
+    { value: 'September', label: 'September' }, { value: 'October', label: 'October' },
+    { value: 'November', label: 'November' }, { value: 'December', label: 'December' }
   ];
-
-  /* =========================
-     HSE SCORING RULES
-  ========================== */
-  const INCIDENT_DEDUCTION_PER_EVENT = 20;
-
-  const TBT_FIRST_BLOCK_COUNT = 4;
-  const TBT_FIRST_BLOCK_SCORE = 20;
-  const TBT_SECOND_BLOCK_COUNT = 4;
-  const TBT_SECOND_BLOCK_SCORE = 2.5;
-  const TBT_THIRD_BLOCK_SCORE = 1;
-
-  const WALKDOWN_SCORE_STEPS = [50, 20, 10];
-  const WALKDOWN_AFTER_SCORE = 5;
-
-  const ACTION_SCORE_STEPS = [50, 20, 10];
-  const ACTION_AFTER_SCORE = 5;
 
   let charts = {};
   let jsonpCounter = 0;
@@ -414,23 +386,85 @@
   let requestToken = 0;
 
   /* =========================
+     NEW SCORING RULES
+  ========================== */
+  function getTbtScore(count) {
+    const c = Math.max(0, Math.floor(Number(count || 0)));
+    if (c === 0) return 0;
+    if (c <= 4) return c * 20;
+    return Math.min(100, 80 + (c - 4));
+  }
+
+  function getActionScore(count) {
+    const c = Math.max(0, Math.floor(Number(count || 0)));
+    if (c === 0) return 0;
+    const map = [0, 50, 70, 80, 85, 90, 95];
+    if (c <= 6) return map[c];
+    return Math.min(100, 95 + (c - 6));
+  }
+  function getWalkdownScore(count) { return getActionScore(count); }
+
+  function getNearMissScore(count) {
+    const c = Math.max(0, Math.floor(Number(count || 0)));
+    if (c === 0) return 0;
+    if (c === 1) return 60;
+    if (c <= 4) return 60 + ((c - 1) * 10);
+    return Math.min(100, 90 + ((c - 4) * 0.5));
+  }
+
+  function getLowSeverityDeduction(count) {
+    const c = Math.max(0, Math.floor(Number(count || 0)));
+    if (c === 0) return 0;
+    if (c === 1) return 2;
+    if (c === 2) return 3;
+    if (c === 3) return 4;
+    return 5;
+  }
+
+  function getSeriousDeduction(count) {
+    const c = Math.max(0, Math.floor(Number(count || 0)));
+    if (c === 0) return 0;
+    if (c === 1) return 5;
+    if (c === 2) return 6;
+    if (c === 3) return 7;
+    if (c === 4) return 8;
+    if (c === 5) return 9;
+    return 10;
+  }
+
+  function calculateSafetyIndex(tbtScore, actionScore, walkdownScore, nearMissScore, lowSevDed, seriousDed) {
+    const base = (tbtScore + actionScore + walkdownScore + nearMissScore) / 4;
+    return clamp(base - lowSevDed - seriousDed, 0, 100);
+  }
+
+  function getSafetyIndex(p) {
+    const lowCount = Number(p.firstAid || 0) + Number(p.mtc || 0) + Number(p.environment || 0);
+    const seriousCount = Number(p.lti || 0) + Number(p.property || 0);
+    return calculateSafetyIndex(
+      getTbtScore(p.toolbox),
+      getActionScore(p.actions),
+      getWalkdownScore(p.walkdowns),
+      getNearMissScore(p.nearMiss),
+      getLowSeverityDeduction(lowCount),
+      getSeriousDeduction(seriousCount)
+    );
+  }
+
+  function getSafetyDirection(p) {
+    const trend = getSafetyTrendData(p).filter(x => x.safetyIndex !== null);
+    if (trend.length < 2) return 'flat';
+    const last = trend[trend.length - 1].safetyIndex;
+    const previous = trend[trend.length - 2].safetyIndex;
+    return last > previous + 0.5 ? 'up' : last < previous - 0.5 ? 'down' : 'flat';
+  }
+
+  /* =========================
      VIEW MANAGEMENT
   ========================== */
   function showView(view) {
-    document.getElementById('projectView').classList.add('hidden');
-    document.getElementById('yearView').classList.add('hidden');
-    document.getElementById('periodView').classList.add('hidden');
-    document.getElementById('compareView').classList.add('hidden');
-    document.getElementById('loadingView').classList.add('hidden');
-    document.getElementById('dashboardView').classList.add('hidden');
-    document.getElementById('errorView').classList.add('hidden');
-
-    if (view === 'project') document.getElementById('projectView').classList.remove('hidden');
-    if (view === 'year') document.getElementById('yearView').classList.remove('hidden');
-    if (view === 'period') document.getElementById('periodView').classList.remove('hidden');
-    if (view === 'compare') document.getElementById('compareView').classList.remove('hidden');
-    if (view === 'loading') document.getElementById('loadingView').classList.remove('hidden');
-    if (view === 'dashboard') document.getElementById('dashboardView').classList.remove('hidden');
+    ['projectView','yearView','periodView','compareView','loadingView','dashboardView','errorView']
+      .forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById(view + 'View').classList.remove('hidden');
 
     if (view === 'project') {
       currentSelection = { project: '', year: '', month: 'All Months' };
@@ -439,45 +473,24 @@
     }
   }
 
-  /* =========================
-     MAIN SELECTION
-  ========================== */
   function buildSelectionButtons() {
     const projectContainer = document.getElementById('projectButtons');
     projectContainer.innerHTML = '';
     PROJECTS.forEach(project => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'selectionButton';
-      button.textContent = project;
-      button.onclick = () => selectProject(project);
-      projectContainer.appendChild(button);
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'selectionButton';
+      btn.textContent = project; btn.onclick = () => selectProject(project); projectContainer.appendChild(btn);
     });
-
-    const allButton = document.createElement('button');
-    allButton.type = 'button';
-    allButton.className = 'selectionButton all';
-    allButton.textContent = 'All Projects';
-    allButton.onclick = () => selectProject('All Projects');
-    projectContainer.appendChild(allButton);
+    const allBtn = document.createElement('button'); allBtn.type = 'button'; allBtn.className = 'selectionButton all';
+    allBtn.textContent = 'All Projects'; allBtn.onclick = () => selectProject('All Projects'); projectContainer.appendChild(allBtn);
 
     const yearContainer = document.getElementById('yearButtons');
     yearContainer.innerHTML = '';
     YEARS.forEach(year => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'selectionButton';
-      button.textContent = year;
-      button.onclick = () => selectYear(year);
-      yearContainer.appendChild(button);
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'selectionButton';
+      btn.textContent = year; btn.onclick = () => selectYear(year); yearContainer.appendChild(btn);
     });
-
-    const allYears = document.createElement('button');
-    allYears.type = 'button';
-    allYears.className = 'selectionButton all';
-    allYears.textContent = 'All Years';
-    allYears.onclick = () => selectYear('All Years');
-    yearContainer.appendChild(allYears);
+    const allYears = document.createElement('button'); allYears.type = 'button'; allYears.className = 'selectionButton all';
+    allYears.textContent = 'All Years'; allYears.onclick = () => selectYear('All Years'); yearContainer.appendChild(allYears);
 
     renderMainPeriodButtons();
   }
@@ -487,245 +500,87 @@
     if (!periodContainer) return;
     periodContainer.innerHTML = '';
     MONTHS.forEach(month => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'periodButton' + (month.value === 'All Months' ? ' all' : '') + (currentSelection.month === month.value ? ' selected' : '');
-      button.textContent = month.label;
-      button.onclick = () => selectPeriod(month.value);
-      periodContainer.appendChild(button);
+      const btn = document.createElement('button'); btn.type = 'button';
+      btn.className = 'periodButton' + (month.value === 'All Months' ? ' all' : '') + (currentSelection.month === month.value ? ' selected' : '');
+      btn.textContent = month.label; btn.onclick = () => selectPeriod(month.value); periodContainer.appendChild(btn);
     });
   }
 
-  function selectProject(project) {
-    currentSelection.project = project;
-    currentSelection.year = '';
-    currentSelection.month = 'All Months';
-    document.getElementById('yearTitle').textContent = 'Select Year';
-    document.getElementById('yearPath').textContent = project;
-    showView('year');
-  }
+  function selectProject(project) { currentSelection.project = project; currentSelection.year = ''; currentSelection.month = 'All Months'; document.getElementById('yearTitle').textContent = 'Select Year'; document.getElementById('yearPath').textContent = project; showView('year'); }
+  function selectYear(year) { currentSelection.year = year; currentSelection.month = 'All Months'; document.getElementById('periodTitle').textContent = 'Select Period'; document.getElementById('periodPath').textContent = currentSelection.project + ' • ' + year; renderMainPeriodButtons(); showView('period'); }
+  function selectPeriod(month) { currentSelection.month = month; loadDashboard(); }
+  function openSingleProject(project) { currentSelection.project = project; loadDashboard(); }
+  function openSingleProjectFromElement(element) { openSingleProject(element && element.dataset ? element.dataset.project : ''); }
 
-  function selectYear(year) {
-    currentSelection.year = year;
-    currentSelection.month = 'All Months';
-    document.getElementById('periodTitle').textContent = 'Select Period';
-    document.getElementById('periodPath').textContent = currentSelection.project + ' • ' + year;
-    renderMainPeriodButtons();
-    showView('period');
-  }
-
-  function selectPeriod(month) {
-    currentSelection.month = month;
-    loadDashboard();
-  }
-
-  function openSingleProject(project) {
-    currentSelection.project = project;
-    loadDashboard();
-  }
-
-  function openSingleProjectFromElement(element) {
-    openSingleProject(element && element.dataset ? element.dataset.project : '');
-  }
-
-  /* =========================
-     COMPARISON SELECTION
-  ========================== */
   function renderCompareProjectButtons() {
-    const pc = document.getElementById('compareProjectButtons');
-    pc.innerHTML = '';
+    const pc = document.getElementById('compareProjectButtons'); pc.innerHTML = '';
     PROJECTS.forEach(project => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'selectionButton compareProjectButton' + (compareSelection.projects.includes(project) ? ' selected' : '');
-      button.textContent = project;
-      button.onclick = () => toggleCompareProject(project);
-      pc.appendChild(button);
+      const btn = document.createElement('button'); btn.type = 'button';
+      btn.className = 'selectionButton compareProjectButton' + (compareSelection.projects.includes(project) ? ' selected' : '');
+      btn.textContent = project; btn.onclick = () => toggleCompareProject(project); pc.appendChild(btn);
     });
-
-    const all = document.createElement('button');
-    all.type = 'button';
+    const all = document.createElement('button'); all.type = 'button';
     all.className = 'selectionButton compareProjectButton all' + (compareSelection.projects.length === PROJECTS.length ? ' selected' : '');
-    all.textContent = 'All Projects';
-    all.onclick = () => {
-      compareSelection.projects = compareSelection.projects.length === PROJECTS.length ? [] : PROJECTS.slice();
-      renderCompareProjectButtons();
-      updateCompareRunState();
-    };
-    pc.appendChild(all);
+    all.textContent = 'All Projects'; all.onclick = () => { compareSelection.projects = compareSelection.projects.length === PROJECTS.length ? [] : PROJECTS.slice(); renderCompareProjectButtons(); updateCompareRunState(); }; pc.appendChild(all);
   }
 
   function renderCompareYearButtons() {
-    const yc = document.getElementById('compareYearButtons');
-    yc.innerHTML = '';
+    const yc = document.getElementById('compareYearButtons'); yc.innerHTML = '';
     YEARS.forEach(year => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'periodButton' + (compareSelection.year === year ? ' selected' : '');
-      button.textContent = year;
-      button.onclick = () => {
-        compareSelection.year = year;
-        renderCompareYearButtons();
-        updateCompareRunState();
-      };
-      yc.appendChild(button);
+      const btn = document.createElement('button'); btn.type = 'button';
+      btn.className = 'periodButton' + (compareSelection.year === year ? ' selected' : ''); btn.textContent = year;
+      btn.onclick = () => { compareSelection.year = year; renderCompareYearButtons(); updateCompareRunState(); }; yc.appendChild(btn);
     });
-
-    const allYears = document.createElement('button');
-    allYears.type = 'button';
-    allYears.className = 'periodButton all' + (compareSelection.year === 'All Years' ? ' selected' : '');
-    allYears.textContent = 'All Years';
-    allYears.onclick = () => {
-      compareSelection.year = 'All Years';
-      renderCompareYearButtons();
-      updateCompareRunState();
-    };
-    yc.appendChild(allYears);
+    const allYears = document.createElement('button'); allYears.type = 'button';
+    allYears.className = 'periodButton all' + (compareSelection.year === 'All Years' ? ' selected' : ''); allYears.textContent = 'All Years';
+    allYears.onclick = () => { compareSelection.year = 'All Years'; renderCompareYearButtons(); updateCompareRunState(); }; yc.appendChild(allYears);
   }
 
   function renderComparePeriodButtons() {
-    const mc = document.getElementById('comparePeriodButtons');
-    mc.innerHTML = '';
+    const mc = document.getElementById('comparePeriodButtons'); mc.innerHTML = '';
     MONTHS.forEach(month => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'periodButton' + (month.value === 'All Months' ? ' all' : '') + (compareSelection.month === month.value ? ' selected' : '');
-      button.textContent = month.label;
-      button.onclick = () => {
-        compareSelection.month = month.value;
-        renderComparePeriodButtons();
-        updateCompareRunState();
-      };
-      mc.appendChild(button);
+      const btn = document.createElement('button'); btn.type = 'button';
+      btn.className = 'periodButton' + (month.value === 'All Months' ? ' all' : '') + (compareSelection.month === month.value ? ' selected' : ''); btn.textContent = month.label;
+      btn.onclick = () => { compareSelection.month = month.value; renderComparePeriodButtons(); updateCompareRunState(); }; mc.appendChild(btn);
     });
   }
 
-  function buildCompareSelectionButtons() {
-    renderCompareProjectButtons();
-    renderCompareYearButtons();
-    renderComparePeriodButtons();
-    updateCompareRunState();
-  }
+  function buildCompareSelectionButtons() { renderCompareProjectButtons(); renderCompareYearButtons(); renderComparePeriodButtons(); updateCompareRunState(); }
+  function toggleCompareProject(project) { const index = compareSelection.projects.indexOf(project); if (index >= 0) { compareSelection.projects.splice(index, 1); } else { compareSelection.projects.push(project); } renderCompareProjectButtons(); updateCompareRunState(); }
+  function openCompareView() { compareSelection = { projects: PROJECTS.slice(), year: currentSelection.year || 'All Years', month: currentSelection.month || 'All Months' }; document.getElementById('compareResults').classList.add('hidden'); document.getElementById('compareError').classList.add('hidden'); showView('compare'); buildCompareSelectionButtons(); }
+  function resetCompareView() { if (compareChart) { compareChart.destroy(); compareChart = null; } document.getElementById('compareResults').classList.add('hidden'); const err = document.getElementById('compareError'); err.classList.add('hidden'); err.textContent = ''; }
+  function updateCompareRunState() { document.getElementById('runCompareButton').disabled = compareSelection.projects.length < 2 || !compareSelection.year || !compareSelection.month; }
 
-  function toggleCompareProject(project) {
-    const index = compareSelection.projects.indexOf(project);
-    if (index >= 0) {
-      compareSelection.projects.splice(index, 1);
-    } else {
-      compareSelection.projects.push(project);
-    }
-    renderCompareProjectButtons();
-    updateCompareRunState();
-  }
-
-  function openCompareView() {
-    compareSelection = {
-      projects: PROJECTS.slice(),
-      year: currentSelection.year || 'All Years',
-      month: currentSelection.month || 'All Months'
-    };
-    document.getElementById('compareResults').classList.add('hidden');
-    document.getElementById('compareError').classList.add('hidden');
-    showView('compare');
-    buildCompareSelectionButtons();
-  }
-
-  function resetCompareView() {
-    if (compareChart) { compareChart.destroy(); compareChart = null; }
-    const results = document.getElementById('compareResults');
-    if (results) results.classList.add('hidden');
-    const err = document.getElementById('compareError');
-    if (err) { err.classList.add('hidden'); err.textContent = ''; }
-  }
-
-  function updateCompareRunState() {
-    const btn = document.getElementById('runCompareButton');
-    if (!btn) return;
-    btn.disabled = compareSelection.projects.length < 2 || !compareSelection.year || !compareSelection.month;
-  }
-
-  /* =========================
-     API / DASHBOARD LOAD
-  ========================== */
   function loadDashboard() {
-    const token = ++requestToken;
-    showView('loading');
+    const token = ++requestToken; showView('loading');
     document.getElementById('loadingText').textContent = 'Loading ' + (currentSelection.project === 'All Projects' ? 'all projects' : currentSelection.project) + ' • ' + currentSelection.year + ' • ' + (currentSelection.month === 'All Months' ? 'All Year' : currentSelection.month);
-
-    callAPI('getDashboardData', { project: currentSelection.project, year: currentSelection.year, month: currentSelection.month }, 2, 15000)
+    callAPI('getDashboardData', { project: currentSelection.project, year: currentSelection.year, month: currentSelection.month })
       .then(data => {
         if (token !== requestToken) return;
-        if (!data || data.success === false) {
-          throw new Error(data && data.error ? data.error : 'No dashboard data returned.');
-        }
+        if (!data || data.success === false) throw new Error(data && data.error ? data.error : 'No dashboard data returned.');
         updateDashboard(data);
         document.getElementById('selectionInfo').textContent = currentSelection.project + ' • ' + currentSelection.year + ' • ' + (currentSelection.month === 'All Months' ? 'All Year' : currentSelection.month);
         showView('dashboard');
       })
-      .catch(error => {
-        if (token !== requestToken) return;
-        showError(error.message || 'Unable to load dashboard data.');
-      });
+      .catch(error => { if (token !== requestToken) return; showError(error.message || 'Unable to load dashboard data.'); });
   }
 
-  function showError(message) {
-    document.getElementById('errorBox').innerHTML = escapeHtml(message) + '<br><button type="button" class="changeButton" style="margin-top:12px" onclick="showView(\'period\')">Back to Selection</button>';
-    document.getElementById('errorView').classList.remove('hidden');
-    document.getElementById('loadingView').classList.add('hidden');
-  }
+  function showError(message) { document.getElementById('errorBox').innerHTML = escapeHtml(message) + '<br><button type="button" class="changeButton" style="margin-top:12px" onclick="showView(\'period\')">Back to Selection</button>'; document.getElementById('errorView').classList.remove('hidden'); document.getElementById('loadingView').classList.add('hidden'); }
 
   function callAPI(action, params = {}, retries = 2, timeout = 15000) {
     return new Promise((resolve, reject) => {
       let attempts = 0;
       function request() {
-        attempts++;
-        const callbackName = '__hse_callback_' + Date.now() + '_' + (++jsonpCounter);
-        const script = document.createElement('script');
-        const queryParams = new URLSearchParams();
-        queryParams.set('action', action);
-        queryParams.set('callback', callbackName);
-
+        attempts++; const callbackName = '__hse_callback_' + Date.now() + '_' + (++jsonpCounter);
+        const script = document.createElement('script'); const queryParams = new URLSearchParams();
+        queryParams.set('action', action); queryParams.set('callback', callbackName);
         Object.keys(params).forEach(key => queryParams.set(key, params[key]));
         script.src = API_URL + '?' + queryParams.toString();
         let completed = false;
-
-        const timer = setTimeout(() => {
-          if (completed) return;
-          completed = true;
-          cleanup();
-          if (attempts <= retries) {
-            setTimeout(request, 500 * attempts);
-          } else {
-            reject(new Error('Dashboard API timeout. Please try again.'));
-          }
-        }, timeout);
-
-        function cleanup() {
-          clearTimeout(timer);
-          delete window[callbackName];
-          if (script.parentNode) { script.parentNode.removeChild(script); }
-        }
-
-        window[callbackName] = data => {
-          if (completed) return;
-          completed = true;
-          cleanup();
-          if (data && data.success === false) {
-            if (attempts <= retries) setTimeout(request, 500 * attempts);
-            else reject(new Error(data.error || 'API Error'));
-            return;
-          }
-          resolve(data);
-        };
-
-        script.onerror = () => {
-          if (completed) return;
-          completed = true;
-          cleanup();
-          if (attempts <= retries) setTimeout(request, 500 * attempts);
-          else reject(new Error('Unable to connect to HSE Dashboard API.'));
-        };
-
+        const timer = setTimeout(() => { if (completed) return; completed = true; cleanup(); if (attempts <= retries) { setTimeout(request, 500 * attempts); } else { reject(new Error('Dashboard API timeout. Please try again.')); } }, timeout);
+        function cleanup() { clearTimeout(timer); delete window[callbackName]; if (script.parentNode) script.parentNode.removeChild(script); }
+        window[callbackName] = data => { if (completed) return; completed = true; cleanup(); if (data && data.success === false) { if (attempts <= retries) setTimeout(request, 500 * attempts); else reject(new Error(data.error || 'API Error')); return; } resolve(data); };
+        script.onerror = () => { if (completed) return; completed = true; cleanup(); if (attempts <= retries) setTimeout(request, 500 * attempts); else reject(new Error('Unable to connect to HSE Dashboard API.')); };
         document.body.appendChild(script);
       }
       request();
@@ -738,67 +593,60 @@
     renderProjects(projects);
   }
 
-  /* =========================
-     PORTFOLIO
-  ========================== */
   function updatePortfolio(data, projects) {
     document.getElementById('activeProjects').textContent = formatNumber(projects.length);
     const singleProject = currentSelection.project && currentSelection.project !== 'All Projects';
     document.getElementById('progressSummary').classList.toggle('hidden', !singleProject);
     document.getElementById('overallProgress').textContent = singleProject ? formatPercent(projects[0] && projects[0].progress) : '—';
+    
     document.getElementById('portfolioNcr').textContent = formatNcrPortfolio(projects);
-    const openNames = projects.filter(p => getNcrOpen(p) > 0).map(p => p.project || 'Project');
+    const openNames = projects.filter(p => Number(p.ncrOpen || 0) > 0).map(p => p.project || 'Project');
     document.getElementById('portfolioNcrOpen').textContent = openNames.length ? 'Open NCR: ' + openNames.join(' • ') : 'No open NCRs';
-    document.getElementById('lowSeverityRate').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.nearMiss || 0) + Number(p.firstAid || 0) + Number(p.mtc || 0), 0));
+    
+    const totalLowSev = projects.reduce((sum, p) => sum + Number(p.firstAid || 0) + Number(p.mtc || 0) + Number(p.environment || 0), 0);
+    document.getElementById('lowSeverityRate').textContent = formatNumber(totalLowSev);
     document.getElementById('portfolioManhours').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.manhours || 0), 0));
     document.getElementById('portfolioSafetyManpower').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.safety || 0), 0));
   }
 
   function formatNcrPortfolio(projects) {
-    const closed = projects.reduce((sum, p) => sum + getNcrClosed(p), 0);
-    const total = projects.reduce((sum, p) => sum + getNcrTotal(p), 0);
-    return formatNumber(closed) + ' / ' + formatNumber(total);
+    const closed = projects.reduce((sum, p) => sum + Number(p.ncrClosed || 0), 0);
+    const open = projects.reduce((sum, p) => sum + Number(p.ncrOpen || 0), 0);
+    return formatNumber(closed) + ' / ' + formatNumber(open);
   }
 
-  function formatNcr(data) {
-    const closed = getNcrClosed(data);
-    const open = getNcrOpen(data);
-    const total = closed + open;
-    return formatNumber(closed) + ' / ' + formatNumber(total);
-  }
-
-  /* =========================
-     PROJECT RENDERING
-  ========================== */
   function renderProjects(projects) {
     const container = document.getElementById('projects');
     destroyCharts();
     const single = currentSelection.project && currentSelection.project !== 'All Projects' && projects.length === 1;
     container.classList.toggle('singleMode', single);
-
-    if (!projects || !projects.length) {
-      container.innerHTML = '<div class="empty">No project data available for the selected filters.</div>';
-      return;
-    }
-
+    if (!projects || !projects.length) { container.innerHTML = '<div class="empty">No project data available for the selected filters.</div>'; return; }
     container.innerHTML = projects.map((project, index) => createProjectCard(project, index, single)).join('');
     projects.forEach((project, index) => createSafetyTrend(project, index, single));
   }
 
   function createSingleKpi(label, value, meta = '', className = '') {
+    return `<div class="singleKpi ${className}"><div class="kpiLabel">${escapeHtml(label)}</div><div class="kpiValue">${value}</div>${meta ? `<div class="kpiMeta">${escapeHtml(meta)}</div>` : ''}</div>`;
+  }
+
+  function indicatorBar(name, scoreValue, heightPct, isIncident, forceNumber, note = '') {
+    const height = clamp(Number(heightPct), 2, 100);
     return `
-      <div class="singleKpi ${className}">
-        <div class="kpiLabel">${escapeHtml(label)}</div>
-        <div class="kpiValue">${value}</div>
-        ${meta ? `<div class="kpiMeta">${escapeHtml(meta)}</div>` : ''}
+      <div class="kpi">
+        <div class="pct">${isIncident || forceNumber ? scoreValue : formatPercent(scoreValue)}</div>
+        <div class="bararea">
+          <div class="${isIncident ? 'bar incidentbar' : 'bar'}" style="--h:${height}"></div>
+        </div>
+        <div class="kname">${escapeHtml(name)}</div>
+        <div class="count">${escapeHtml(note)}</div>
       </div>
     `;
   }
 
   function createProjectCard(p, index, singleMode) {
     const progress = clamp(Number(p.progress || 0), 0, 100);
-    const lowCount = Number(p.nearMiss || 0) + Number(p.firstAid || 0) + Number(p.mtc || 0);
-    const seriousCount = Number(p.lti || 0);
+    const lowCount = Number(p.firstAid || 0) + Number(p.mtc || 0) + Number(p.environment || 0);
+    const seriousCount = Number(p.lti || 0) + Number(p.property || 0);
     const seriousRate = Number(p.seriousIncidentRate || 0);
     const projectId = 'project_' + index;
     const safetyIndex = getSafetyIndex(p);
@@ -807,76 +655,51 @@
     let performanceSection = '';
 
     if (singleMode) {
-      const ncrScore = ncrPercent(p);
-      const tbtScore = getTbtScore(p.toolbox);
-      const trainingScore = getTrainingScore(p);
-      const actionScore = getActionScore(p.actions);
-      const walkdownScore = getWalkdownScore(p.walkdowns);
-      const seriousScore = getSeriousScore(p);
-
       performanceSection = `
         <div class="safety">
-          <div class="shead">
-            <b>HSE PERFORMANCE</b>
-            <span>Actual KPI Values + Performance Score</span>
-          </div>
+          <div class="shead"><b>HSE PERFORMANCE</b><span>Actual KPI Values + Performance Score</span></div>
           <div class="singleKpis">
-            ${createSingleKpi('Toolbox Talks', formatNumber(p.toolbox), 'Actual count • Score: ' + formatPercent(tbtScore), 'positive')}
-            ${createSingleKpi('Training', formatNumber(p.training), trainingScore === null ? 'Actual people trained • Score not supplied by API' : 'Actual people trained • Score: ' + formatPercent(trainingScore), 'positive')}
-            ${createSingleKpi('NCR Closure', formatNcrProject(p), getNcrOpen(p) === 0 ? 'No open NCR • Score: 100%' : 'Score: ' + formatPercent(ncrScore), ncrScore === 100 ? 'positive' : 'negative')}
-            ${createSingleKpi('Action Tracking', formatNumber(p.actions), 'Actual count • Score: ' + formatPercent(actionScore), 'positive')}
-            ${createSingleKpi('Walkdowns', formatNumber(p.walkdowns), 'Actual count • Score: ' + formatPercent(walkdownScore), 'positive')}
-            ${createSingleKpi('Near Miss', formatNumber(p.nearMiss), 'Positive HSE indicator', 'positive')}
-            ${createSingleKpi('First Aid', formatNumber(p.firstAid), p.firstAid > 0 ? 'Negative event' : 'No event', p.firstAid > 0 ? 'negative' : '')}
-            ${createSingleKpi('Medical Treatment', formatNumber(p.mtc), p.mtc > 0 ? 'Negative event' : 'No event', p.mtc > 0 ? 'negative' : '')}
-            ${createSingleKpi('LTI', formatNumber(p.lti), 'Serious incident • Score: ' + formatPercent(seriousScore), p.lti > 0 ? 'negative' : 'positive')}
-            ${createSingleKpi('Property Damage', formatNumber(p.property), p.property > 0 ? 'Negative event' : 'No event', p.property > 0 ? 'negative' : '')}
-            ${createSingleKpi('Environmental', formatNumber(p.environment), p.environment > 0 ? 'Negative event' : 'No event', p.environment > 0 ? 'negative' : '')}
-            ${createSingleKpi('Safe Man-Hours', formatNumber(p.manhours), 'Actual project man-hours')}
-            ${createSingleKpi('Safety Index', safetyIndex === null ? 'N/A' : formatPercent(safetyIndex), 'Calculated from available KPI scores', 'score')}
-            ${createSingleKpi('Incident Performance', formatPercent(getIncidentPerformance(p)), 'Near Miss not penalized • negative events deducted', 'score')}
+            ${createSingleKpi('Toolbox Talks', formatNumber(p.toolbox), 'Score: ' + formatPercent(getTbtScore(p.toolbox)), 'positive')}
+            ${createSingleKpi('Action Tracking', formatNumber(p.actions), 'Score: ' + formatPercent(getActionScore(p.actions)), 'positive')}
+            ${createSingleKpi('Walkdowns', formatNumber(p.walkdowns), 'Score: ' + formatPercent(getWalkdownScore(p.walkdowns)), 'positive')}
+            ${createSingleKpi('Near Miss', formatNumber(p.nearMiss), 'Score: ' + formatPercent(getNearMissScore(p.nearMiss)), 'positive')}
+            ${createSingleKpi('Low Severity', formatNumber(lowCount), 'FA, MTC, Env • Deduction: ' + getLowSeverityDeduction(lowCount) + '%', lowCount > 0 ? 'negative' : 'positive')}
+            ${createSingleKpi('Serious / LTI', formatNumber(seriousCount), 'LTI, Property • Deduction: ' + getSeriousDeduction(seriousCount) + '%', seriousCount > 0 ? 'negative' : 'positive')}
+            ${createSingleKpi('Training', formatNumber(p.training), 'Number of people (Not Scored)', 'positive')}
+            ${createSingleKpi('NCR Status', Number(p.ncrClosed || 0) + ' / ' + Number(p.ncrOpen || 0), 'Total: ' + Number(p.ncrTotal || 0))}
+            ${createSingleKpi('Safety Index', safetyIndex === null ? 'N/A' : formatPercent(safetyIndex), 'Overall Score', 'score')}
           </div>
-        </div>
-      `;
+        </div>`;
     } else {
       performanceSection = `
         <div class="safety">
-          <div class="shead">
-            <b>SAFETY PERFORMANCE INDICATORS</b>
-            <span>Actual data + scoring</span>
-          </div>
+          <div class="shead"><b>SAFETY PERFORMANCE INDICATORS</b><span>Actual data + scoring</span></div>
           <div class="bars">
-            ${indicatorBar('Toolbox', p.toolbox, Math.max(1, Number(p.toolbox || 0) || 1), false, true, 'Score ' + formatPercent(getTbtScore(p.toolbox)))}
-            ${indicatorBar('Training', p.training, Math.max(1, Number(p.training || 0) || 1), false, true, getTrainingScore(p) === null ? 'Raw Count' : 'Score ' + formatPercent(getTrainingScore(p)))}
-            ${indicatorBar('NCR Closure', getNcrClosed(p), getNcrTotal(p), false, false, 'Score ' + formatPercent(ncrPercent(p)))}
-            ${indicatorBar('Actions', p.actions, Math.max(1, Number(p.actions || 0) || 1), false, true, 'Score ' + formatPercent(getActionScore(p.actions)))}
-            ${indicatorBar('Walkdowns', p.walkdowns, Math.max(1, Number(p.walkdowns || 0) || 1), false, true, 'Score ' + formatPercent(getWalkdownScore(p.walkdowns)))}
-            ${indicatorBar('Low Severity', lowCount, Math.max(1, lowCount), true, true, 'NM + FA + MTC')}
-            ${indicatorBar('Serious', seriousCount, Math.max(1, seriousCount), true, true, 'Score ' + formatPercent(getSeriousScore(p)))}
+            ${indicatorBar('Toolbox', getTbtScore(p.toolbox), getTbtScore(p.toolbox), false, false, 'Count: ' + formatNumber(p.toolbox))}
+            ${indicatorBar('Actions', getActionScore(p.actions), getActionScore(p.actions), false, false, 'Count: ' + formatNumber(p.actions))}
+            ${indicatorBar('Walkdowns', getWalkdownScore(p.walkdowns), getWalkdownScore(p.walkdowns), false, false, 'Count: ' + formatNumber(p.walkdowns))}
+            ${indicatorBar('Near Miss', getNearMissScore(p.nearMiss), getNearMissScore(p.nearMiss), false, false, 'Count: ' + formatNumber(p.nearMiss))}
+            ${indicatorBar('Low Severity', formatNumber(lowCount), Math.max(2, lowCount * 10), true, true, '- ' + getLowSeverityDeduction(lowCount) + '%')}
+            ${indicatorBar('Serious', formatNumber(seriousCount), Math.max(2, seriousCount * 10), true, true, '- ' + getSeriousDeduction(seriousCount) + '%')}
           </div>
-        </div>
-      `;
+        </div>`;
     }
 
     return `
       <div class="card project-card">
         <div class="ctop">
-          <div class="pname projectLink" data-project="${escapeHtml(p.project || 'Project')}" onclick="openSingleProjectFromElement(this)" title="Open ${escapeHtml(p.project || 'Project')}">
-            ${escapeHtml(p.project || 'Project')}
-          </div>
-          <div class="status">${getProjectStatus(progress, seriousRate, p)}</div>
+          <div class="pname projectLink" data-project="${escapeHtml(p.project || 'Project')}" onclick="openSingleProjectFromElement(this)" title="Open ${escapeHtml(p.project || 'Project')}">${escapeHtml(p.project || 'Project')}</div>
+          <div class="status">${Number(seriousRate) > 0 || Number(p.lti || 0) > 0 ? 'ATTENTION' : Number(progress) >= 75 ? 'ON TRACK' : Number(progress) >= 40 ? 'IN PROGRESS' : 'START-UP'}</div>
         </div>
         <div class="info">
-          <div class="ring" style="--progress:${progress * 3.6}deg">
-            <b>${formatPercent(progress)}</b>
-          </div>
+          <div class="ring" style="--progress:${progress * 3.6}deg"><b>${formatPercent(progress)}</b></div>
           <div>
             <div class="label">PROJECT PROGRESS</div>
             <div class="value">${formatPercent(progress)}</div>
             <div class="note">Real project progress from HSE project data.</div>
           </div>
           <div class="man">
-            <div class="label">MANPOWER</div>
+            <div class="label">DAILY AVERAGE MANPOWER</div>
             <div class="value">${formatNumber(p.manpower)}</div>
             <div class="label" style="margin-top:5px">SAFETY</div>
             <div class="value">${formatNumber(p.safety)}</div>
@@ -885,10 +708,7 @@
         ${performanceSection}
         <div class="detailRow">
           <div class="expand" onclick="toggleExpand(this)">
-            <div class="expandHead">
-              <b>INCIDENT SUMMARY</b>
-              <span><span class="arrow">▼</span></span>
-            </div>
+            <div class="expandHead"><b>INCIDENT SUMMARY</b><span><span class="arrow">▼</span></span></div>
             <div class="expandBody">
               <div class="grid8">
                 ${mini('Near Miss', p.nearMiss)}
@@ -903,20 +723,15 @@
             </div>
           </div>
           <div class="expand" onclick="toggleExpand(this)">
-            <div class="expandHead">
-              <b>HSE PERFORMANCE</b>
-              <span><span class="arrow">▼</span></span>
-            </div>
+            <div class="expandHead"><b>HSE PERFORMANCE</b><span><span class="arrow">▼</span></span></div>
             <div class="expandBody">
-              <div class="summary">
-                <strong>Safe Man-Hours:</strong> ${formatNumber(p.manhours)}
-              </div>
+              <div class="summary"><strong>Safe Man-Hours:</strong> ${formatNumber(p.manhours)}</div>
               <div class="grid8">
-                ${mini('NCR Closure', formatNcrProject(p))}
+                ${mini('NCR Status', Number(p.ncrClosed || 0) + ' / ' + Number(p.ncrOpen || 0) + ' (Tot: ' + Number(p.ncrTotal || 0) + ')')}
+                ${mini('Training (People)', formatNumber(p.training))}
                 ${mini('Action Tracking', formatNumber(p.actions) + ' / ' + formatPercent(getActionScore(p.actions)))}
                 ${mini('Walkdowns', formatNumber(p.walkdowns) + ' / ' + formatPercent(getWalkdownScore(p.walkdowns)))}
-                ${mini('Toolbox Talks', formatNumber(p.toolbox))}
-                ${mini('Training', formatNumber(p.training))}
+                ${mini('Toolbox Talks', formatNumber(p.toolbox) + ' / ' + formatPercent(getTbtScore(p.toolbox)))}
                 ${mini('Safety Index', safetyIndex === null ? 'N/A' : formatPercent(safetyIndex))}
               </div>
             </div>
@@ -926,337 +741,84 @@
           <div class="trendhead">
             <span>HSE PERFORMANCE TREND</span>
             <div class="trendheadRight">
-              <span class="trendScoreBox">
-                Safety Index <b>${safetyIndex === null ? 'N/A' : formatPercent(safetyIndex)}</b>
-                <span class="trendArrow ${arrowClass}">${arrow === 'up' ? '↑' : arrow === 'down' ? '↓' : '→'}</span>
-              </span>
+              <span class="trendScoreBox">Safety Index <b>${safetyIndex === null ? 'N/A' : formatPercent(safetyIndex)}</b><span class="trendArrow ${arrowClass}">${arrow === 'up' ? '↑' : arrow === 'down' ? '↓' : '→'}</span></span>
               <span>Monthly KPI View</span>
             </div>
           </div>
           <div class="trendSnapshot">
-            ${snapshot('Toolbox', p.toolbox, false)}
-            ${snapshot('Training', p.training, false)}
-            ${snapshot('NCR Closure', ncrPercent(p))}
-            ${snapshot('Actions', p.actions, false)}
-            ${snapshot('Walkdowns', p.walkdowns, false)}
+            ${snapshot('Toolbox', getTbtScore(p.toolbox))}
+            ${snapshot('Actions', getActionScore(p.actions))}
+            ${snapshot('Walkdowns', getWalkdownScore(p.walkdowns))}
+            ${snapshot('Near Miss', getNearMissScore(p.nearMiss))}
             ${snapshot('Safety Index', safetyIndex)}
           </div>
-          <div class="chart">
-            <canvas id="${projectId}"></canvas>
-          </div>
+          <div class="chart"><canvas id="${projectId}"></canvas></div>
           <div id="trendNotice_${index}" class="trendNotice hidden"></div>
         </div>
-      </div>
-    `;
+      </div>`;
   }
 
-  /* =========================
-     NCR LOGIC
-  ========================== */
-  function getNcrClosed(p) {
-    if (p && p.ncrClosed !== undefined && p.ncrClosed !== null && p.ncrClosed !== '') {
-      return Math.max(0, Number(p.ncrClosed) || 0);
-    }
-    if (p && p.ncr !== undefined && p.ncr !== null && p.ncr !== '') {
-      return Math.max(0, Number(p.ncr) || 0);
-    }
-    return 0;
-  }
+  function mini(label, value) { return `<div class="mini"><small>${escapeHtml(label)}</small><strong>${formatDisplay(value)}</strong></div>`; }
+  function snapshot(label, value) { return `<div class="snap"><small>${escapeHtml(label)}</small><strong>${value === null || value === undefined || value === '' ? 'N/A' : formatPercent(value)}</strong></div>`; }
 
-  function getNcrOpen(p) {
-    if (p && p.ncrOpen !== undefined && p.ncrOpen !== null && p.ncrOpen !== '') {
-      return Math.max(0, Number(p.ncrOpen) || 0);
-    }
-    return 0;
-  }
-
-  function getNcrTotal(p) { return getNcrClosed(p) + getNcrOpen(p); }
-  function formatNcrProject(p) { return formatNumber(getNcrClosed(p)) + ' / ' + formatNumber(getNcrTotal(p)); }
-
-  function ncrPercent(p) {
-    const closed = getNcrClosed(p);
-    const open = getNcrOpen(p);
-    const total = closed + open;
-    if (open === 0 || total <= 0) return 100;
-    return clamp((closed / total) * 100, 0, 100);
-  }
-
-  function ncrTrendValue(x) {
-    if (x && x.ncrClosure !== undefined && x.ncrClosure !== null && x.ncrClosure !== '') {
-      const open = Number(x.ncrOpen || 0);
-      if (open === 0) return 100;
-      return clamp(Number(x.ncrClosure) || 0, 0, 100);
-    }
-    const closed = Number(x && x.ncrClosed || 0);
-    const open = Number(x && x.ncrOpen || 0);
-    const total = x && x.ncrTotal !== undefined ? Number(x.ncrTotal || 0) : closed + open;
-    if (open === 0) return 100;
-    return total > 0 ? clamp((closed / total) * 100, 0, 100) : 100;
-  }
-
-  /* =========================
-     SCORING
-  ========================== */
-  function getTbtScore(count) {
-    let remaining = Math.max(0, Number(count || 0));
-    let score = 0;
-    const first = Math.min(remaining, TBT_FIRST_BLOCK_COUNT);
-    score += first * TBT_FIRST_BLOCK_SCORE;
-    remaining -= first;
-    if (remaining > 0) {
-      const second = Math.min(remaining, TBT_SECOND_BLOCK_COUNT);
-      score += second * TBT_SECOND_BLOCK_SCORE;
-      remaining -= second;
-    }
-    if (remaining > 0) {
-      score += remaining * TBT_THIRD_BLOCK_SCORE;
-    }
-    return clamp(score, 0, 100);
-  }
-
-  function getStepScore(count, steps, afterScore) {
-    const value = Math.max(0, Math.floor(Number(count || 0)));
-    if (value <= 0) return 0;
-    let score = 0;
-    const firstCount = Math.min(value, steps.length);
-    for (let i = 0; i < firstCount; i++) {
-      score += steps[i];
-    }
-    const remaining = value - steps.length;
-    if (remaining > 0) {
-      score += remaining * afterScore;
-    }
-    return clamp(score, 0, 100);
-  }
-
-  function getWalkdownScore(count) {
-    return getStepScore(count, WALKDOWN_SCORE_STEPS, WALKDOWN_AFTER_SCORE);
-  }
-
-  function getActionScore(count) {
-    return getStepScore(count, ACTION_SCORE_STEPS, ACTION_AFTER_SCORE);
-  }
-
-  function getSeriousScore(p) {
-    const lti = Math.max(0, Number(p && p.lti || 0));
-    return clamp(100 - (lti * 25), 0, 100);
-  }
-
-  function getTrainingScore(p) {
-    if (p && p.trainingScore !== undefined && p.trainingScore !== null && p.trainingScore !== '') {
-      return clamp(Number(p.trainingScore), 0, 100);
-    }
-    if (p && p.trainingPercent !== undefined && p.trainingPercent !== null && p.trainingPercent !== '') {
-      return clamp(Number(p.trainingPercent), 0, 100);
-    }
-    return null;
-  }
-
-  function getIncidentPerformance(p) {
-    const negativeEvents = Number(p && p.mtc || 0) + Number(p && p.firstAid || 0) + Number(p && p.lti || 0) + Number(p && p.property || 0) + Number(p && p.environment || 0);
-    if (negativeEvents <= 0) return 100;
-    return clamp(100 - (negativeEvents * INCIDENT_DEDUCTION_PER_EVENT), 0, 100);
-  }
-
-  function getSafetyIndex(p) {
-    const scores = [
-      getTbtScore(p.toolbox),
-      ncrPercent(p),
-      getActionScore(p.actions),
-      getWalkdownScore(p.walkdowns),
-      getSeriousScore(p),
-      getIncidentPerformance(p)
-    ];
-    const trainingScore = getTrainingScore(p);
-    if (trainingScore !== null) scores.push(trainingScore);
-    const validScores = scores.filter(v => v !== null && v !== undefined && isFinite(Number(v)));
-    if (!validScores.length) return null;
-    return clamp(validScores.reduce((sum, value) => sum + Number(value), 0) / validScores.length, 0, 100);
-  }
-
-  function getSafetyDirection(p) {
-    const trend = getSafetyTrendData(p).filter(x => x.safetyIndex !== null);
-    if (trend.length < 2) return 'flat';
-    const last = trend[trend.length - 1].safetyIndex;
-    const previous = trend[trend.length - 2].safetyIndex;
-    return last > previous + 0.5 ? 'up' : last < previous - 0.5 ? 'down' : 'flat';
-  }
-
-  /* =========================
-     KPI BAR
-  ========================== */
-  function indicatorBar(name, value, scale, isIncident, forceNumber, note = '') {
-    const numeric = Number(value || 0);
-    const safeScale = Number(scale || 0);
-    const height = safeScale > 0 ? clamp((numeric / safeScale) * 100, 2, 100) : 2;
-    let displayValue;
-    if (name === 'NCR Closure') {
-      displayValue = formatNumber(numeric) + ' / ' + formatNumber(safeScale);
-    } else if (isIncident || forceNumber) {
-      displayValue = formatNumber(numeric);
-    } else {
-      displayValue = formatPercent(numeric);
-    }
-
-    return `
-      <div class="kpi">
-        <div class="pct">${displayValue}</div>
-        <div class="bararea">
-          <div class="${isIncident ? 'bar incidentbar' : 'bar'}" style="--h:${height}"></div>
-        </div>
-        <div class="kname">${escapeHtml(name)}</div>
-        <div class="count">${note ? escapeHtml(note) : isIncident ? 'Count' : name === 'NCR Closure' ? 'Closed / Total' : formatNumber(numeric)}</div>
-      </div>
-    `;
-  }
-
-  function mini(label, value) {
-    return `
-      <div class="mini">
-        <small>${escapeHtml(label)}</small>
-        <strong>${formatDisplay(value)}</strong>
-      </div>
-    `;
-  }
-
-  /* =========================
-     TREND DATA
-  ========================== */
   function getSafetyTrendData(p) {
     let source = Array.isArray(p.safetyTrend) ? p.safetyTrend : [];
-    if (!source.length && Array.isArray(p.trend)) {
-      const looksLikeSafety = p.trend.some(x => x && ['toolbox', 'training', 'actions', 'walkdowns', 'ncrClosure', 'ncrClosed', 'ncrTotal', 'ncrOpen', 'lowSeverity', 'serious', 'safetyIndex', 'nearMiss', 'firstAid', 'mtc', 'lti', 'property', 'environment'].some(key => x[key] !== undefined));
-      if (looksLikeSafety) source = p.trend;
-    }
     return source.map(x => {
-      const ncr = ncrTrendValue(x);
-      const lowSeverity = x.lowSeverity !== undefined ? x.lowSeverity : Number(x.nearMiss || 0) + Number(x.firstAid || 0) + Number(x.mtc || 0);
-      const incidentPerformance = getIncidentPerformance(x);
-      const tbtScore = getTbtScore(x.toolbox);
-      const actionScore = getActionScore(x.actions);
-      const walkdownScore = getWalkdownScore(x.walkdowns);
-      const seriousScore = getSeriousScore(x);
-      const trainingScore = getTrainingScore(x);
-      
-      const scoreValues = [tbtScore, ncr, actionScore, walkdownScore, seriousScore, incidentPerformance];
-      if (trainingScore !== null) scoreValues.push(trainingScore);
-      
-      const validScores = scoreValues.filter(v => v !== null && v !== undefined && isFinite(Number(v)));
-      const index = validScores.length ? validScores.reduce((sum, value) => sum + Number(value), 0) / validScores.length : null;
-
+      const lowCount = Number(x.firstAid || 0) + Number(x.mtc || 0) + Number(x.environment || 0);
+      const seriousCount = Number(x.lti || 0) + Number(x.property || 0);
       return {
         month: x.month || x.label || '',
-        toolbox: safeNum(x.toolbox),
-        training: safeNum(x.training),
-        trainingScore: trainingScore,
-        ncrClosure: ncr,
-        actions: safeNum(x.actions),
-        actionScore: actionScore,
-        walkdowns: safeNum(x.walkdowns),
-        walkdownScore: walkdownScore,
-        lowSeverity: safeNum(lowSeverity),
-        serious: safeNum(x.serious !== undefined ? x.serious : x.lti),
-        incidentPerformance: incidentPerformance,
-        seriousScore: seriousScore,
-        safetyIndex: index
+        toolbox: safeNum(x.toolbox), actions: safeNum(x.actions), walkdowns: safeNum(x.walkdowns),
+        nearMiss: safeNum(x.nearMiss), training: safeNum(x.training),
+        lowSeverity: lowCount, serious: seriousCount,
+        safetyIndex: calculateSafetyIndex(getTbtScore(x.toolbox), getActionScore(x.actions), getWalkdownScore(x.walkdowns), getNearMissScore(x.nearMiss), getLowSeverityDeduction(lowCount), getSeriousDeduction(seriousCount))
       };
     }).filter(x => x.month);
   }
 
   function createSafetyTrend(p, index, large) {
-    const canvasId = 'project_' + index;
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const trend = getSafetyTrendData(p);
-    const notice = document.getElementById('trendNotice_' + index);
-
-    if (!trend.length) {
-      if (notice) {
-        notice.textContent = 'Monthly safety KPI history is not available from the current API response. The dashboard will not invent trend values.';
-        notice.classList.remove('hidden');
-      }
-      return;
-    }
+    const canvasId = 'project_' + index; const canvas = document.getElementById(canvasId); if (!canvas) return;
+    const trend = getSafetyTrendData(p); const notice = document.getElementById('trendNotice_' + index);
+    if (!trend.length) { if (notice) { notice.textContent = 'Monthly safety KPI history is not available.'; notice.classList.remove('hidden'); } return; }
 
     const labels = trend.map(x => x.month);
     const toolbox = trend.map(x => safeNum(x.toolbox));
     const training = trend.map(x => safeNum(x.training));
-    const ncr = trend.map(x => safeNum(x.ncrClosure));
     const actions = trend.map(x => safeNum(x.actions));
     const walkdowns = trend.map(x => safeNum(x.walkdowns));
+    const nearMiss = trend.map(x => safeNum(x.nearMiss));
     const low = trend.map(x => safeNum(x.lowSeverity));
     const serious = trend.map(x => safeNum(x.serious));
-    const incidentPerformance = trend.map(x => x.incidentPerformance == null ? null : safeNum(x.incidentPerformance));
     const score = trend.map(x => x.safetyIndex == null ? null : safeNum(x.safetyIndex));
 
     const datasets = [
-      { type: 'bar', label: 'Toolbox Talks - Count', data: toolbox, yAxisID: 'counts', borderRadius: 4 },
+      { type: 'bar', label: 'Toolbox - Count', data: toolbox, yAxisID: 'counts', borderRadius: 4 },
       { type: 'bar', label: 'Training - Count', data: training, yAxisID: 'counts', borderRadius: 4 },
       { type: 'bar', label: 'Actions - Count', data: actions, yAxisID: 'counts', borderRadius: 4 },
       { type: 'bar', label: 'Walkdowns - Count', data: walkdowns, yAxisID: 'counts', borderRadius: 4 },
-      { type: 'line', label: 'NCR Closure %', data: ncr, yAxisID: 'performance', borderWidth: 2, tension: 0.35, pointRadius: large ? 3 : 2 },
-      { type: 'line', label: 'Incident Performance %', data: incidentPerformance, yAxisID: 'performance', borderWidth: 2, tension: 0.35, pointRadius: large ? 3 : 2 },
+      { type: 'bar', label: 'Near Miss - Count', data: nearMiss, yAxisID: 'counts', borderRadius: 4 },
       { type: 'line', label: 'Safety Index %', data: score, yAxisID: 'performance', borderWidth: 3, tension: 0.35, pointRadius: large ? 4 : 2 },
-      { type: 'bar', label: 'Low Severity Incidents', data: low, yAxisID: 'incidents', borderRadius: 3 },
+      { type: 'bar', label: 'Low Severity', data: low, yAxisID: 'incidents', borderRadius: 3 },
       { type: 'bar', label: 'Serious / LTI', data: serious, yAxisID: 'incidents', borderRadius: 3 }
     ];
 
     charts[canvasId] = new Chart(canvas, {
       data: { labels: labels, datasets: datasets },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: large ? 9 : 7 } } },
-          tooltip: {
-            callbacks: {
-              label: ctx => {
-                const label = ctx.dataset.label || '';
-                if (ctx.dataset.yAxisID === 'performance') return label + ': ' + formatPercent(ctx.parsed.y);
-                return label + ': ' + formatNumber(ctx.parsed.y);
-              }
-            }
-          }
-        },
+        responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: large ? 9 : 7 } } },
+          tooltip: { callbacks: { label: ctx => { const label = ctx.dataset.label || ''; if (ctx.dataset.yAxisID === 'performance') return label + ': ' + formatPercent(ctx.parsed.y); return label + ': ' + formatNumber(ctx.parsed.y); } } } },
         scales: {
           x: { ticks: { font: { size: large ? 8 : 7 }, maxRotation: 0 }, grid: { display: false } },
           counts: { display: true, beginAtZero: true, position: 'left', title: { display: large, text: 'Actual Count', font: { size: 9 } } },
           performance: { display: true, beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false }, title: { display: large, text: 'Performance %', font: { size: 9 } } },
           incidents: { display: large, beginAtZero: true, position: 'left', grid: { drawOnChartArea: false }, title: { display: large, text: 'Incident Count', font: { size: 9 } } }
-        },
-        elements: { line: { fill: false } }
+        }, elements: { line: { fill: false } }
       }
     });
   }
 
-  /* =========================
-     FORMATTING
-  ========================== */
-  function snapshot(label, value, isPercent = true) {
-    return `
-      <div class="snap">
-        <small>${escapeHtml(label)}</small>
-        <strong>${value === null || value === undefined || value === '' ? 'N/A' : isPercent === false ? formatNumber(value) : formatPercent(value)}</strong>
-      </div>
-    `;
-  }
-
-  function destroyCharts() {
-    Object.keys(charts).forEach(key => {
-      if (charts[key]) {
-        charts[key].destroy();
-        delete charts[key];
-      }
-    });
-  }
-
-  function getProjectStatus(progress, seriousRate, p) {
-    const lti = Number(p && p.lti || 0);
-    if (Number(seriousRate) > 0 || lti > 0) return 'ATTENTION';
-    return Number(progress) >= 75 ? 'ON TRACK' : Number(progress) >= 40 ? 'IN PROGRESS' : 'START-UP';
-  }
-
+  function destroyCharts() { Object.keys(charts).forEach(key => { if (charts[key]) { charts[key].destroy(); delete charts[key]; } }); }
   function toggleExpand(element) { element.classList.toggle('open'); }
   function formatNumber(value) { const num = Number(value || 0); return !isFinite(num) ? '0' : num.toLocaleString('en-US', { maximumFractionDigits: 2 }); }
   function formatPercent(value) { const num = Number(value || 0); return !isFinite(num) ? '0%' : num.toLocaleString('en-US', { maximumFractionDigits: 2 }) + '%'; }
@@ -1270,117 +832,63 @@
   ========================== */
   function runComparison() {
     if (compareSelection.projects.length < 2 || !compareSelection.year || !compareSelection.month) return;
-    const error = document.getElementById('compareError');
-    error.classList.add('hidden');
-    const btn = document.getElementById('runCompareButton');
-    btn.disabled = true;
-    btn.textContent = 'Loading comparison...';
+    const error = document.getElementById('compareError'); error.classList.add('hidden');
+    const btn = document.getElementById('runCompareButton'); btn.disabled = true; btn.textContent = 'Loading comparison...';
 
     const requests = compareSelection.projects.map(project => {
-      return callAPI('getDashboardData', { project: project, year: compareSelection.year, month: compareSelection.month }, 2, 15000)
-        .then(data => {
-          if (!data || data.success === false) throw new Error(data && data.error ? data.error : 'No data returned for ' + project);
-          const list = Array.isArray(data.projectData) ? data.projectData : [];
-          const row = list.find(x => x.project === project) || list[0];
-          if (!row) throw new Error('No project data returned for ' + project);
-          return row;
-        });
+      return callAPI('getDashboardData', { project: project, year: compareSelection.year, month: compareSelection.month })
+        .then(data => { if (!data || data.success === false) throw new Error(data && data.error ? data.error : 'No data returned for ' + project);
+          const list = Array.isArray(data.projectData) ? data.projectData : []; const row = list.find(x => x.project === project) || list[0];
+          if (!row) throw new Error('No project data returned for ' + project); return row; });
     });
 
-    Promise.all(requests)
-      .then(rows => renderComparison(rows))
-      .catch(err => {
-        error.textContent = err.message || 'Unable to load comparison data.';
-        error.classList.remove('hidden');
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = 'Compare Selected Projects';
-        updateCompareRunState();
-      });
+    Promise.all(requests).then(rows => renderComparison(rows)).catch(err => { error.textContent = err.message || 'Unable to load comparison data.'; error.classList.remove('hidden'); }).finally(() => { btn.disabled = false; btn.textContent = 'Compare Selected Projects'; updateCompareRunState(); });
   }
 
   function renderComparison(rows) {
     document.getElementById('compareTableBody').innerHTML = rows.map(p => {
-      const low = Number(p.nearMiss || 0) + Number(p.firstAid || 0) + Number(p.mtc || 0);
-      const ncr = ncrPercent(p);
+      const low = Number(p.firstAid || 0) + Number(p.mtc || 0) + Number(p.environment || 0);
+      const seriousCount = Number(p.lti || 0) + Number(p.property || 0);
       const score = getSafetyIndex(p);
-      const actionScore = getActionScore(p.actions);
-      const walkdownScore = getWalkdownScore(p.walkdowns);
-
       return `
         <tr>
           <td><b>${escapeHtml(p.project || 'Project')}</b></td>
           <td>${formatPercent(p.progress)}</td>
-          <td>${formatNumber(p.toolbox)}</td>
+          <td>${formatNumber(p.toolbox)} / ${formatPercent(getTbtScore(p.toolbox))}</td>
           <td>${formatNumber(p.training)}</td>
-          <td>${formatNcrProject(p)}<br><small>${formatPercent(ncr)}</small></td>
-          <td>${formatNumber(p.actions)} / ${formatPercent(actionScore)}</td>
-          <td>${formatNumber(p.walkdowns)} / ${formatPercent(walkdownScore)}</td>
+          <td>${formatNumber(p.actions)} / ${formatPercent(getActionScore(p.actions))}</td>
+          <td>${formatNumber(p.walkdowns)} / ${formatPercent(getWalkdownScore(p.walkdowns))}</td>
+          <td>${formatNumber(p.nearMiss)} / ${formatPercent(getNearMissScore(p.nearMiss))}</td>
           <td>${formatNumber(low)}</td>
-          <td>${formatNumber(p.lti)} / ${formatPercent(getSeriousScore(p))}</td>
-          <td>${formatNumber(p.manhours)}</td>
-          <td>${formatNumber(p.safety)}</td>
+          <td>${formatNumber(seriousCount)} / -${getSeriousDeduction(seriousCount)}%</td>
+          <td>${Number(p.ncrClosed || 0)} / ${Number(p.ncrOpen || 0)}</td>
           <td class="scoreCell">${score === null ? 'N/A' : formatPercent(score)}</td>
-        </tr>
-      `;
+        </tr>`;
     }).join('');
-
     document.getElementById('compareResultMeta').textContent = compareSelection.year + ' • ' + (compareSelection.month === 'All Months' ? 'All Year' : compareSelection.month);
-    document.getElementById('compareResults').classList.remove('hidden');
-    renderComparisonChart(rows);
+    document.getElementById('compareResults').classList.remove('hidden'); renderComparisonChart(rows);
   }
 
   function renderComparisonChart(rows) {
     if (compareChart) { compareChart.destroy(); compareChart = null; }
-    const labels = rows.map(p => p.project || 'Project');
-    
     const datasets = [
-      { label: 'Toolbox Talks - Count', data: rows.map(p => Number(p.toolbox || 0)), yAxisID: 'counts', borderWidth: 1, borderRadius: 4 },
-      { label: 'Training - Count', data: rows.map(p => Number(p.training || 0)), yAxisID: 'counts', borderWidth: 1, borderRadius: 4 },
-      { label: 'NCR Closure %', data: rows.map(p => Number(ncrPercent(p))), yAxisID: 'performance', borderWidth: 1, borderRadius: 4 },
+      { label: 'Toolbox Talks Score %', data: rows.map(p => Number(getTbtScore(p.toolbox))), yAxisID: 'performance', borderWidth: 1, borderRadius: 4 },
       { label: 'Action Score %', data: rows.map(p => Number(getActionScore(p.actions))), yAxisID: 'performance', borderWidth: 1, borderRadius: 4 },
       { label: 'Walkdown Score %', data: rows.map(p => Number(getWalkdownScore(p.walkdowns))), yAxisID: 'performance', borderWidth: 1, borderRadius: 4 },
-      { label: 'Serious / LTI Score %', data: rows.map(p => Number(getSeriousScore(p))), yAxisID: 'performance', borderWidth: 1, borderRadius: 4 },
-      { label: 'Incident Performance %', data: rows.map(p => Number(getIncidentPerformance(p))), yAxisID: 'performance', borderWidth: 1, borderRadius: 4 },
+      { label: 'Near Miss Score %', data: rows.map(p => Number(getNearMissScore(p.nearMiss))), yAxisID: 'performance', borderWidth: 1, borderRadius: 4 },
       { label: 'Safety Index %', data: rows.map(p => Number(getSafetyIndex(p) || 0)), yAxisID: 'performance', borderWidth: 2, borderRadius: 4 }
     ];
-
     compareChart = new Chart(document.getElementById('compareChart'), {
-      type: 'bar',
-      data: { labels: labels, datasets: datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 8 } } },
-          tooltip: {
-            callbacks: {
-              label: ctx => {
-                const label = ctx.dataset.label || '';
-                if (ctx.dataset.yAxisID === 'performance') return label + ': ' + formatPercent(ctx.parsed.y);
-                return label + ': ' + formatNumber(ctx.parsed.y);
-              }
-            }
-          }
-        },
-        scales: {
-          x: { ticks: { font: { size: 8 } }, grid: { display: false } },
-          counts: { beginAtZero: true, position: 'left', title: { display: true, text: 'Actual Count', font: { size: 9 } } },
-          performance: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Performance %', font: { size: 9 } } }
-        }
-      }
+      type: 'bar', data: { labels: rows.map(p => p.project || 'Project'), datasets: datasets },
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 8 } } }, tooltip: { callbacks: { label: ctx => { const label = ctx.dataset.label || ''; if (ctx.dataset.yAxisID === 'performance') return label + ': ' + formatPercent(ctx.parsed.y); return label + ': ' + formatNumber(ctx.parsed.y); } } } },
+        scales: { x: { ticks: { font: { size: 8 } }, grid: { display: false } }, performance: { beginAtZero: true, max: 100, position: 'left', grid: { drawOnChartArea: false }, title: { display: true, text: 'Performance %', font: { size: 9 } } } } }
     });
   }
 
-  /* =========================
-     INITIALIZE
-  ========================== */
   buildSelectionButtons();
   buildCompareSelectionButtons();
   showView('project');
-
 </script>
 </body>
 </html>
