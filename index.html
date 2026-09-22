@@ -50,11 +50,11 @@
     .changeButton { background: #0b7f68; border: 0; color: #fff; padding: 9px 13px; border-radius: 9px; font-size: 10px; font-weight: 800; cursor: pointer; }
     .changeButton:hover { background: #0f927a; }
 
-    .portfolio { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 16px; }
+    .portfolio { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 16px; }
     .sum { background: #103845; border: 1px solid #35606a; border-radius: 13px; padding: 12px; color: #fff; }
-    .sum label { font-size: 9px; color: #b8cdd2; font-weight: 800; }
+    .sum label { font-size: 8px; color: #b8cdd2; font-weight: 800; }
     .sum strong { display: block; font-size: 22px; margin: 4px 0; }
-    .sum span { font-size: 9px; }
+    .sum span { font-size: 8px; }
     .good { color: #4bd0a8; }
     .warn { color: #ff9b78; }
 
@@ -172,7 +172,7 @@
 
     @media (max-width: 1200px) {
       .projects { grid-template-columns: repeat(2, 1fr); }
-      .portfolio { grid-template-columns: repeat(3, 1fr); }
+      .portfolio { grid-template-columns: repeat(4, 1fr); }
       .selectionGrid { grid-template-columns: repeat(2, 1fr); }
       .singleKpis { grid-template-columns: repeat(2, 1fr); }
     }
@@ -338,6 +338,11 @@
         <span>FA + MTC + Env</span>
       </div>
       <div class="sum">
+        <label>SERIOUS INCIDENTS</label>
+        <strong id="portfolioSerious">0</strong>
+        <span class="warn">LTI + Property Damage</span>
+      </div>
+      <div class="sum">
         <label>SAFE MAN-HOURS</label>
         <strong id="portfolioManhours">0</strong>
         <span class="good">Total project man-hours</span>
@@ -389,18 +394,21 @@
      NEW SCORING RULES
   ========================== */
   function getTbtScore(count) {
-    const c = Math.max(0, Math.floor(Number(count || 0)));
-    if (c === 0) return 0;
+    const c = Math.max(0, Number(count || 0));
+    if (c <= 0) return 0;
     if (c <= 4) return c * 20;
-    return Math.min(100, 80 + (c - 4));
+    if (c <= 14) return 80 + (c - 4);
+    return Math.min(100, 90 + ((c - 14) / 50));
   }
 
   function getActionScore(count) {
-    const c = Math.max(0, Math.floor(Number(count || 0)));
-    if (c === 0) return 0;
-    const map = [0, 50, 70, 80, 85, 90, 95];
-    if (c <= 6) return map[c];
-    return Math.min(100, 95 + (c - 6));
+    const c = Math.max(0, Number(count || 0));
+    if (c <= 0) return 0;
+    if (c <= 1) return c * 50;
+    if (c <= 2) return 50 + ((c - 1) * 20);
+    if (c <= 3) return 70 + ((c - 2) * 10);
+    if (c <= 18) return 80 + (c - 3);
+    return Math.min(100, 95 + ((c - 18) / 50));
   }
   function getWalkdownScore(count) { return getActionScore(count); }
 
@@ -605,6 +613,10 @@
     
     const totalLowSev = projects.reduce((sum, p) => sum + Number(p.firstAid || 0) + Number(p.mtc || 0) + Number(p.environment || 0), 0);
     document.getElementById('lowSeverityRate').textContent = formatNumber(totalLowSev);
+    
+    const totalSerious = projects.reduce((sum, p) => sum + Number(p.lti || 0) + Number(p.property || 0), 0);
+    document.getElementById('portfolioSerious').textContent = formatNumber(totalSerious);
+
     document.getElementById('portfolioManhours').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.manhours || 0), 0));
     document.getElementById('portfolioSafetyManpower').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.safety || 0), 0));
   }
