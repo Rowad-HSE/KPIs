@@ -327,10 +327,9 @@
         <span>Current project progress</span>
       </div>
       <div class="sum">
-        <label>NCR STATUS</label>
-        <strong id="portfolioNcr">0 / 0</strong>
-        <span class="good">Closed / Open</span>
-        <span id="portfolioNcrOpen" class="warn" style="display:block;margin-top:5px;"></span>
+        <label>NCR STATUS (TOTAL)</label>
+        <strong id="portfolioNcrClosed" style="color: #4bd0a8; font-size: 16px; margin-top: 6px; display: block;">Closed: 0</strong>
+        <strong id="portfolioNcrOpen" style="color: #ff9b78; font-size: 16px; margin-top: 4px; display: block;">Open: 0</strong>
       </div>
       <div class="sum">
         <label>TOTAL LOW SEVERITY INCIDENTS</label>
@@ -607,9 +606,11 @@
     document.getElementById('progressSummary').classList.toggle('hidden', !singleProject);
     document.getElementById('overallProgress').textContent = singleProject ? formatPercent(projects[0] && projects[0].progress) : '—';
     
-    document.getElementById('portfolioNcr').textContent = formatNcrPortfolio(projects);
-    const openNames = projects.filter(p => Number(p.ncrOpen || 0) > 0).map(p => p.project || 'Project');
-    document.getElementById('portfolioNcrOpen').textContent = openNames.length ? 'Open NCR: ' + openNames.join(' • ') : 'No open NCRs';
+    // التعديل الثاني: حساب التوتال الفعلي للمفتوح والمقفول
+    const closedNcr = projects.reduce((sum, p) => sum + Number(p.ncrClosed || 0), 0);
+    const openNcr = projects.reduce((sum, p) => sum + Number(p.ncrOpen || 0), 0);
+    document.getElementById('portfolioNcrClosed').textContent = 'Closed: ' + formatNumber(closedNcr);
+    document.getElementById('portfolioNcrOpen').textContent = 'Open: ' + formatNumber(openNcr);
     
     const totalLowSev = projects.reduce((sum, p) => sum + Number(p.firstAid || 0) + Number(p.mtc || 0) + Number(p.environment || 0), 0);
     document.getElementById('lowSeverityRate').textContent = formatNumber(totalLowSev);
@@ -619,12 +620,6 @@
 
     document.getElementById('portfolioManhours').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.manhours || 0), 0));
     document.getElementById('portfolioSafetyManpower').textContent = formatNumber(projects.reduce((sum, p) => sum + Number(p.safety || 0), 0));
-  }
-
-  function formatNcrPortfolio(projects) {
-    const closed = projects.reduce((sum, p) => sum + Number(p.ncrClosed || 0), 0);
-    const open = projects.reduce((sum, p) => sum + Number(p.ncrOpen || 0), 0);
-    return formatNumber(closed) + ' / ' + formatNumber(open);
   }
 
   function renderProjects(projects) {
@@ -699,6 +694,8 @@
 
     return `
       <div class="card project-card">
+        <!-- التعديل الأول: إضافة الـ Manhours فوق اسم المشروع -->
+        <div style="font-size: 11px; color: #52616c; font-weight: 800; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dashed #dbe4e8;">Total Manhours: ${formatNumber(p.manhours)}</div>
         <div class="ctop">
           <div class="pname projectLink" data-project="${escapeHtml(p.project || 'Project')}" onclick="openSingleProjectFromElement(this)" title="Open ${escapeHtml(p.project || 'Project')}">${escapeHtml(p.project || 'Project')}</div>
           <div class="status">${Number(seriousRate) > 0 || Number(p.lti || 0) > 0 ? 'ATTENTION' : Number(progress) >= 75 ? 'ON TRACK' : Number(progress) >= 40 ? 'IN PROGRESS' : 'START-UP'}</div>
