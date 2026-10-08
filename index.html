@@ -606,9 +606,10 @@
     document.getElementById('progressSummary').classList.toggle('hidden', !singleProject);
     document.getElementById('overallProgress').textContent = singleProject ? formatPercent(projects[0] && projects[0].progress) : '—';
     
-    // التعديل الثاني: حساب التوتال الفعلي للمفتوح والمقفول
-    const closedNcr = projects.reduce((sum, p) => sum + Number(p.ncrClosed || 0), 0);
-    const openNcr = projects.reduce((sum, p) => sum + Number(p.ncrOpen || 0), 0);
+    // الجمع باستخدام المسميات الدقيقة الجديدة للمقفول والمفتوح
+    const closedNcr = projects.reduce((sum, p) => sum + Number(p['NCR Closure'] || 0), 0);
+    const openNcr = projects.reduce((sum, p) => sum + Number(p['NCR Open'] || 0), 0);
+    
     document.getElementById('portfolioNcrClosed').textContent = 'Closed: ' + formatNumber(closedNcr);
     document.getElementById('portfolioNcrOpen').textContent = 'Open: ' + formatNumber(openNcr);
     
@@ -673,7 +674,7 @@
             ${createSingleKpi('Low Severity', formatNumber(lowCount), 'FA, MTC, Env • Deduction: ' + getLowSeverityDeduction(lowCount) + '%', lowCount > 0 ? 'negative' : 'positive')}
             ${createSingleKpi('Serious / LTI', formatNumber(seriousCount), 'LTI, Property • Deduction: ' + getSeriousDeduction(seriousCount) + '%', seriousCount > 0 ? 'negative' : 'positive')}
             ${createSingleKpi('Training', formatNumber(p.training), 'Number of people (Not Scored)', 'positive')}
-            ${createSingleKpi('NCR Status', Number(p.ncrClosed || 0) + ' / ' + Number(p.ncrOpen || 0), 'Total: ' + Number(p.ncrTotal || 0))}
+            ${createSingleKpi('NCR Status', Number(p['NCR Closure'] || 0) + ' / ' + Number(p['NCR Open'] || 0), 'Total: ' + (Number(p['NCR Closure'] || 0) + Number(p['NCR Open'] || 0)))}
             ${createSingleKpi('Safety Index', safetyIndex === null ? 'N/A' : formatPercent(safetyIndex), 'Overall Score', 'score')}
           </div>
         </div>`;
@@ -694,7 +695,6 @@
 
     return `
       <div class="card project-card">
-        <!-- التعديل الأول: إضافة الـ Manhours فوق اسم المشروع -->
         <div style="font-size: 11px; color: #52616c; font-weight: 800; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dashed #dbe4e8;">Total Manhours: ${formatNumber(p.manhours)}</div>
         <div class="ctop">
           <div class="pname projectLink" data-project="${escapeHtml(p.project || 'Project')}" onclick="openSingleProjectFromElement(this)" title="Open ${escapeHtml(p.project || 'Project')}">${escapeHtml(p.project || 'Project')}</div>
@@ -736,7 +736,7 @@
             <div class="expandBody">
               <div class="summary"><strong>Safe Man-Hours:</strong> ${formatNumber(p.manhours)}</div>
               <div class="grid8">
-                ${mini('NCR Status', Number(p.ncrClosed || 0) + ' / ' + Number(p.ncrOpen || 0) + ' (Tot: ' + Number(p.ncrTotal || 0) + ')')}
+                ${mini('NCR Status', Number(p['NCR Closure'] || 0) + ' / ' + Number(p['NCR Open'] || 0) + ' (Tot: ' + (Number(p['NCR Closure'] || 0) + Number(p['NCR Open'] || 0)) + ')')}
                 ${mini('Training (People)', formatNumber(p.training))}
                 ${mini('Action Tracking', formatNumber(p.actions) + ' / ' + formatPercent(getActionScore(p.actions)))}
                 ${mini('Walkdowns', formatNumber(p.walkdowns) + ' / ' + formatPercent(getWalkdownScore(p.walkdowns)))}
@@ -870,7 +870,7 @@
           <td>${formatNumber(p.nearMiss)} / ${formatPercent(getNearMissScore(p.nearMiss))}</td>
           <td>${formatNumber(low)}</td>
           <td>${formatNumber(seriousCount)} / -${getSeriousDeduction(seriousCount)}%</td>
-          <td>${Number(p.ncrClosed || 0)} / ${Number(p.ncrOpen || 0)}</td>
+          <td>${Number(p['NCR Closure'] || 0)} / ${Number(p['NCR Open'] || 0)}</td>
           <td class="scoreCell">${score === null ? 'N/A' : formatPercent(score)}</td>
         </tr>`;
     }).join('');
