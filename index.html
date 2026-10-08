@@ -326,11 +326,15 @@
         <strong id="overallProgress">0%</strong>
         <span>Current project progress</span>
       </div>
+      
+      <!-- تعديل شكل بطاقة الـ NCR عشان تعرض Total, Closed, Open بالترتيب -->
       <div class="sum">
-        <label>NCR STATUS (TOTAL)</label>
-        <strong id="portfolioNcrClosed" style="color: #4bd0a8; font-size: 16px; margin-top: 6px; display: block;">Closed: 0</strong>
-        <strong id="portfolioNcrOpen" style="color: #ff9b78; font-size: 16px; margin-top: 4px; display: block;">Open: 0</strong>
+        <label>NCR STATUS</label>
+        <strong id="portfolioNcrTotal" style="font-size: 17px; margin-top: 4px; display: block; color: #fff;">Total NCR: 0</strong>
+        <strong id="portfolioNcrClosed" style="color: #4bd0a8; font-size: 13px; margin-top: 4px; display: block;">Closed: 0</strong>
+        <strong id="portfolioNcrOpen" style="color: #ff9b78; font-size: 13px; margin-top: 2px; display: block;">Open: 0</strong>
       </div>
+
       <div class="sum">
         <label>TOTAL LOW SEVERITY INCIDENTS</label>
         <strong id="lowSeverityRate">0</strong>
@@ -606,12 +610,14 @@
     document.getElementById('progressSummary').classList.toggle('hidden', !singleProject);
     document.getElementById('overallProgress').textContent = singleProject ? formatPercent(projects[0] && projects[0].progress) : '—';
     
-    // الجمع باستخدام المسميات الثابتة ncrClosed و ncrOpen
-    const closedNcr = projects.reduce((sum, p) => sum + Number(p.ncrClosed || 0), 0);
-    const openNcr = projects.reduce((sum, p) => sum + Number(p.ncrOpen || 0), 0);
+    // الحسبة الجديدة للـ NCR بناءً على طلبك
+    const totalNcrIssued = projects.reduce((sum, p) => sum + Number(p.ncrOpen || 0), 0); // اللي اتفتحوا (Total)
+    const closedNcr = projects.reduce((sum, p) => sum + Number(p.ncrClosed || 0), 0); // اللي اتقفلوا
+    const activeOpenNcr = Math.max(0, totalNcrIssued - closedNcr); // الفرق ما بين الاتنين (Open)
     
+    document.getElementById('portfolioNcrTotal').textContent = 'Total NCR: ' + formatNumber(totalNcrIssued);
     document.getElementById('portfolioNcrClosed').textContent = 'Closed: ' + formatNumber(closedNcr);
-    document.getElementById('portfolioNcrOpen').textContent = 'Open: ' + formatNumber(openNcr);
+    document.getElementById('portfolioNcrOpen').textContent = 'Open: ' + formatNumber(activeOpenNcr);
     
     const totalLowSev = projects.reduce((sum, p) => sum + Number(p.firstAid || 0) + Number(p.mtc || 0) + Number(p.environment || 0), 0);
     document.getElementById('lowSeverityRate').textContent = formatNumber(totalLowSev);
@@ -660,6 +666,12 @@
     const safetyIndex = getSafetyIndex(p);
     const arrow = getSafetyDirection(p);
     const arrowClass = arrow === 'up' ? 'up' : arrow === 'down' ? 'down' : 'flat';
+    
+    // حسابات الـ NCR الخاصة بالكارت
+    const projTotalNcr = Number(p.ncrOpen || 0);
+    const projClosedNcr = Number(p.ncrClosed || 0);
+    const projActiveNcr = Math.max(0, projTotalNcr - projClosedNcr);
+
     let performanceSection = '';
 
     if (singleMode) {
@@ -674,7 +686,7 @@
             ${createSingleKpi('Low Severity', formatNumber(lowCount), 'FA, MTC, Env • Deduction: ' + getLowSeverityDeduction(lowCount) + '%', lowCount > 0 ? 'negative' : 'positive')}
             ${createSingleKpi('Serious / LTI', formatNumber(seriousCount), 'LTI, Property • Deduction: ' + getSeriousDeduction(seriousCount) + '%', seriousCount > 0 ? 'negative' : 'positive')}
             ${createSingleKpi('Training', formatNumber(p.training), 'Number of people (Not Scored)', 'positive')}
-            ${createSingleKpi('NCR Status', Number(p.ncrClosed || 0) + ' / ' + Number(p.ncrOpen || 0), 'Total: ' + (Number(p.ncrClosed || 0) + Number(p.ncrOpen || 0)))}
+            ${createSingleKpi('NCR Status', projClosedNcr + ' / ' + projActiveNcr, 'Total Issued: ' + projTotalNcr)}
             ${createSingleKpi('Safety Index', safetyIndex === null ? 'N/A' : formatPercent(safetyIndex), 'Overall Score', 'score')}
           </div>
         </div>`;
@@ -736,7 +748,7 @@
             <div class="expandBody">
               <div class="summary"><strong>Safe Man-Hours:</strong> ${formatNumber(p.manhours)}</div>
               <div class="grid8">
-                ${mini('NCR Status', Number(p.ncrClosed || 0) + ' / ' + Number(p.ncrOpen || 0) + ' (Tot: ' + (Number(p.ncrClosed || 0) + Number(p.ncrOpen || 0)) + ')')}
+                ${mini('NCR Status', projClosedNcr + ' / ' + projActiveNcr + ' (Tot: ' + projTotalNcr + ')')}
                 ${mini('Training (People)', formatNumber(p.training))}
                 ${mini('Action Tracking', formatNumber(p.actions) + ' / ' + formatPercent(getActionScore(p.actions)))}
                 ${mini('Walkdowns', formatNumber(p.walkdowns) + ' / ' + formatPercent(getWalkdownScore(p.walkdowns)))}
@@ -859,6 +871,11 @@
       const low = Number(p.firstAid || 0) + Number(p.mtc || 0) + Number(p.environment || 0);
       const seriousCount = Number(p.lti || 0) + Number(p.property || 0);
       const score = getSafetyIndex(p);
+      
+      const projTotalNcr = Number(p.ncrOpen || 0);
+      const projClosedNcr = Number(p.ncrClosed || 0);
+      const projActiveNcr = Math.max(0, projTotalNcr - projClosedNcr);
+
       return `
         <tr>
           <td><b>${escapeHtml(p.project || 'Project')}</b></td>
@@ -870,7 +887,7 @@
           <td>${formatNumber(p.nearMiss)} / ${formatPercent(getNearMissScore(p.nearMiss))}</td>
           <td>${formatNumber(low)}</td>
           <td>${formatNumber(seriousCount)} / -${getSeriousDeduction(seriousCount)}%</td>
-          <td>${Number(p.ncrClosed || 0)} / ${Number(p.ncrOpen || 0)}</td>
+          <td>${projClosedNcr} / ${projActiveNcr}</td>
           <td class="scoreCell">${score === null ? 'N/A' : formatPercent(score)}</td>
         </tr>`;
     }).join('');
